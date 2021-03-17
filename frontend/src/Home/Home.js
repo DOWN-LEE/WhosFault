@@ -19,6 +19,12 @@ const MainPage = (props) => {
         props.history.push('result/'+inputvalue);
     }
 
+    const handleKey=(e)=>{
+        if(e.key=='Enter'){
+            props.history.push('result/'+inputvalue);
+        }
+    }
+
     return(
         <div>
             <br/>
@@ -34,6 +40,7 @@ const MainPage = (props) => {
                 size='large'
                 className='summoner_search'
                 onChange={e=>setinput(e.target.value)}
+                onKeyPress={e=>handleKey(e)}
             />
 
             <br/> <br/> <br/> <br/> <br/>

@@ -66,13 +66,21 @@ const Result = (props) => {
             set_av(Number(result['average']));
             setReady(true);
         });
-    },[])
+    },[beReady])
     const clickHeader =()=>{
         props.history.push('/home');
     }
 
      const handleClick =()=>{
-        props.history.push('result/'+inputvalue);
+        props.history.push(inputvalue);
+        setReady(false);
+    }
+
+    const handleKey=(e)=>{
+        if(e.key=='Enter'){
+            props.history.push(inputvalue);
+            setReady(false);
+        }
     }
 
     if (beReady)
@@ -96,6 +104,7 @@ const Result = (props) => {
                             size='large'
                             className='summoner_search'
                             onChange={e=>setinput(e.target.value)}
+                            onKeyPress={e=>handleKey(e)}
                         />
                     </Grid.Column>
                     <Grid.Column only='computer'/>
@@ -115,6 +124,7 @@ const Result = (props) => {
                             action={{onClick: handleClick }}
                             className='summoner_search_mobile'
                             onChange={e=>setinput(e.target.value)}
+                            onKeyPress={e=>handleKey(e)}
                         />
                     </Grid.Row>
                 </Grid>
@@ -213,6 +223,7 @@ const Result = (props) => {
                             size='large'
                             className='summoner_search'
                             onChange={e=>setinput(e.target.value)}
+                            onKeyPress={e=>handleKey(e)}
                         />
                     </Grid.Column>
                     <Grid.Column only='computer'/>
@@ -232,6 +243,7 @@ const Result = (props) => {
                             action={{onClick: handleClick }}
                             className='summoner_search_mobile'
                             onChange={e=>setinput(e.target.value)}
+                            onKeyPress={e=>handleKey(e)}
                         />
                     </Grid.Row>
                 </Grid>
