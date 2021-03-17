@@ -1,0 +1,48 @@
+.rankbox{
+    float: right;
+    margin-right: 100px;
+}
+
+.rankbox_mobile{
+    position: relative;
+    top: 25px;
+    float: right;
+    margin-right: 80px;
+}
+
+.mobile_box1{
+    position: relative;
+    top: 25px;
+    left: -10px;
+   
+    margin-right: 80px;
+}
+
+.mobile_box2{
+    position: relative;
+    left: 20px;
+    top: 25px;
+    margin-right: 80px;
+}
+
+.mobile_box1 .rankbox_info_mobile{
+    position: relative;
+    top: -70px;
+    left: 65px;
+    text-align: left;
+}
+
+.mobile_box2 .rankbox_info_mobile{
+    position: relative;
+    right: -65px;
+    top: -70px;
+    text-align: left;
+}
+
+
+.rankbox_info{
+    position: relative;
+    left: 90px;
+    top: -70px;
+    text-align: left;
+}

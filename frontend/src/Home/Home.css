@@ -1,0 +1,17 @@
+.logo_title{
+    font-size: 5rem !important;
+    font-family: 'Myung' !important;
+    
+}
+
+.summoner_search > input {
+    
+    width: 500px;
+}
+
+
+
+.pepe_q{
+    position: relative;
+    margin : 0 auto ;
+}

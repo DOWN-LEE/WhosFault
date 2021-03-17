@@ -1,0 +1,66 @@
+.rank_type{
+    position: relative;
+    bottom : 10px;
+    left : 0px;
+    font-weight:500;
+    font-size: normal;
+}
+
+.game_result{
+    color: rgb(79, 79, 206);
+    position: relative;
+    left: 5px;
+    bottom: 8px;
+    font-size: large;
+    font-weight: 700;
+}
+.game_result1{
+    color: rgb(196, 23, 23);
+    position: relative;
+    left: 5px;
+    bottom: 8px;
+    font-size: large;
+    font-weight: 700;
+}
+
+
+.champion_img{
+    border-radius: 20%;
+}
+
+.spell_img{
+    position: relative;
+    left: -20px;
+    border-radius: 15%;
+}
+
+.kda_score{
+  
+    font-weight:900;
+    font-size: x-large;
+    white-space: nowrap;
+    
+    margin-left: -100%;
+    margin-right: -100%;
+    text-align: center;
+}
+
+.kda{
+    margin-left: -100%;
+    margin-right: -100%;
+    text-align: center;
+}
+
+.fucking1{
+    font-family: 'uhbee' !important;
+    font-size: large;
+    font-weight: bold;
+    color: rgb(252, 157, 176);
+    white-space: nowrap;
+}
+
+.fucking2{
+    font-family: 'ON_hwa' !important;
+    font-size: large;
+    color: crimson;
+}
