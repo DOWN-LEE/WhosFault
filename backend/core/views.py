@@ -8,6 +8,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import render
 from core.models import Summoner
 from core.tools import *
+from core.redis.Redis import RedisQueue
 
 import requests
 import json
@@ -167,6 +168,111 @@ def get_result(request, username='원스타교장샘'):
     
 
 
+def get_result1(request, username='원스타교장샘'):
+    if request.method == 'GET':
+        try:
+            Summoner.objects.get(name=username)
+        except: #소환사가 db에 없엉 ㅠㅠ
+            pass
+        
+        summoner = requests.get(url_by_name + username, headers=headers)
+
+        if summoner.status_code != 200:
+            print('wrong 잘못된 소환사 이름')
+    
+        summoner = json.loads(summoner.text)
+        summonerLevel = summoner['summonerLevel']
+        profileIconId = summoner['profileIconId']
+        summoner_id = summoner['id']
+        accountId = summoner['accountId']
+        puuid = summoner['puuid']
+
+        rankinfo = requests.get(url_rank_by_summonerid + summoner_id, headers=headers)
+
+        if rankinfo.status_code != 200:
+            print('wrong')
+
+        solo_rank = { 'rank':0, 'wins':0, 'losses':0 }
+        flex_rank = { 'rank':0, 'wins':0, 'losses':0 }
+        rankinfo = json.loads(rankinfo.text)
+        for rank in rankinfo:
+            target_rank=None
+            if rank['queueType'] == 'RANKED_FLEX_SR':
+                target_rank=flex_rank
+            elif rank['queueType'] == 'RANKED_SOLO_5x5':
+                target_rank=solo_rank
+            else:
+                continue
+
+            target_rank['rank'] = rankToNum(rank['tier'], rank['rank'])
+            target_rank['wins'] = rank['wins']
+            target_rank['losses'] = rank['losses']
+        
+        target_summoner = Summoner(
+            name = username,
+            summonerId = summoner_id,
+            accountId = accountId,
+            puuid = puuid,
+            profileIconId = int(profileIconId),
+            summonerLevel = int(summonerLevel),
+            solo_rank = solo_rank['rank'],
+            solo_rank_win = solo_rank['wins'],
+            solo_rank_loss = solo_rank['losses'],
+            flex_rank = flex_rank['rank'],
+            flex_rank_win = flex_rank['wins'],
+            flex_rank_loss = flex_rank['losses']
+        )
+
+
+        matchlist = requests.get(url_matchlist_by_accontid + accountId, headers=headers)
+        if matchlist.status_code != 200:
+            print('wrong')
+        
+        matchlist = json.loads(matchlist.text)['matches']
+        real_matchlist=[]
+        for m in matchlist:
+            if m['queue'] in queue_target:
+                real_matchlist.append(m)
+            if len(real_matchlist) >= 8:
+                break
+
+        matches=[]
+        average=0
+        rq = RedisQueue("matches")
+        for match in real_matchlist:
+            match_id = str(match['gameId'])
+            rq.push(match_id)
+        
+        matches_result=[]
+        for match in real_matchlist:
+            match_id = str(match['gameId'])
+            while rq.exist_by_key(match_id)==0:
+                pass
+
+            matches_result.append(rq.get_by_key(match_id))
+            rq.del_by_key(match_id)
+        
+        matches_return = []
+        for match in matches_result:
+            matches_return.append(analyze_match(match))
+        
+
+        response_dict = {
+        'user_name': username,
+        'user_level': summonerLevel,
+        'user_profile' : profileIconId,
+        'solo_rank' : solo_rank,
+        'flex_rank' : flex_rank,
+        'matches' : matches_return,
+        'average' : average
+        }
+        return HttpResponse(content=json.dumps(response_dict), status=203)
+
+
+    return HttpResponseNotAllowed(['GET'])
+
+def analyze_match(matchinfo):
+    pass
 
 { 
 'champion':'Lux', 'spell1':'4', 'spell2':'5', 'win':True, 'gameType':'solo',
