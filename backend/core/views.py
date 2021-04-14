@@ -7,16 +7,18 @@ django.setup()
 from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import render
 from core.models import Summoner
-from core.tools import *
+from core.tools.tools import *
+from core.tools.riotAPI import *
 from core.redis.Redis import RedisQueue
 
 import requests
 import json
 import time
 import roleml
+import asyncio
 
 
-games=9
+MATCHES_NUM = 8
 
 queue_table = {'420':'solo', '430':'normal', '440':'flex', '450':'aram', '900':'URF'}
 queue_target = [420,430,440]
@@ -171,26 +173,34 @@ def get_result(request, username='원스타교장샘'):
 def get_result1(request, username='원스타교장샘'):
     if request.method == 'GET':
         try:
-            Summoner.objects.get(name=username)
+            summoner = Summoner.objects.get(name=username)
+            get_info_from_db(summoner)
+            return HttpResponse(content=json.dumps(response_dict), status=203)
+            
         except: #소환사가 db에 없엉 ㅠㅠ
             pass
         
-        summoner = requests.get(url_by_name + username, headers=headers)
-
+        summoner = api_summoner(username=username)
         if summoner.status_code != 200:
-            print('wrong 잘못된 소환사 이름')
+            # 없는 소환사
+            return HttpResponse(status=404)
     
+
         summoner = json.loads(summoner.text)
         summonerLevel = summoner['summonerLevel']
         profileIconId = summoner['profileIconId']
         summoner_id = summoner['id']
         accountId = summoner['accountId']
         puuid = summoner['puuid']
+        
+        r_m = {"rankinfo":None, "matchlist":None}
+        ## 비동기 처리
+        asyncio.run(api_rank_matchlist(summoner_id, accountId, r_m))
+        rankinfo = r_m["rankinfo"]
+        matchlist = r_m["matchlist"]
 
-        rankinfo = requests.get(url_rank_by_summonerid + summoner_id, headers=headers)
-
-        if rankinfo.status_code != 200:
-            print('wrong')
+        if matchlist.status_code != 200 or rankinfo.status_code != 200:
+            return HttpResponse(status=400)
 
         solo_rank = { 'rank':0, 'wins':0, 'losses':0 }
         flex_rank = { 'rank':0, 'wins':0, 'losses':0 }
@@ -224,16 +234,14 @@ def get_result1(request, username='원스타교장샘'):
         )
 
 
-        matchlist = requests.get(url_matchlist_by_accontid + accountId, headers=headers)
-        if matchlist.status_code != 200:
-            print('wrong')
+        
         
         matchlist = json.loads(matchlist.text)['matches']
         real_matchlist=[]
         for m in matchlist:
             if m['queue'] in queue_target:
                 real_matchlist.append(m)
-            if len(real_matchlist) >= 8:
+            if len(real_matchlist) >= MATCHES_NUM:
                 break
 
         matches=[]
@@ -247,7 +255,7 @@ def get_result1(request, username='원스타교장샘'):
         for match in real_matchlist:
             match_id = str(match['gameId'])
             while rq.exist_by_key(match_id)==0:
-                pass
+                time.sleep(0.2)
 
             matches_result.append(rq.get_by_key(match_id))
             rq.del_by_key(match_id)
@@ -270,6 +278,10 @@ def get_result1(request, username='원스타교장샘'):
 
 
     return HttpResponseNotAllowed(['GET'])
+
+
+def get_info_from_db(summoner):
+    pass
 
 def analyze_match(matchinfo):
     pass
