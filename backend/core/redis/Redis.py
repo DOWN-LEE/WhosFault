@@ -17,14 +17,20 @@ class RedisQueue(object):
         self.key = name
         self.rq = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DBNUM)
 
-    # def size(self): # 큐 크기 확인
-    #     return self.rq.llen(self.key)
+    def size(self): # 큐 크기 확인
+        return self.rq.llen(self.key)
 
-    # def isEmpty(self): # 비어있는 큐인지 확인
-    #     return self.size() == 0
+    def isEmpty(self): # 비어있는 큐인지 확인
+        return self.size() == 0
 
     def push(self, element): # 데이터 넣기
-        self.rq.rpush(self.key, element) # left push
+        self.rq.rpush(self.key, element)
+    
+    def pop(self):
+        self
+    
+    def getlist(self, num):
+        return self.rq.lrange(self.key, 0, num)
 
     # def get(self, isBlocking=False, timeout=None): # 데이터 꺼내기
     #     if isBlocking:
@@ -48,4 +54,9 @@ class RedisQueue(object):
     def del_by_key(self, key):
         self.rq.delete(key)
 
-q = RedisQueue("sibal")
+
+
+
+if __name__ == '__main__':
+    q = RedisQueue("sibal")
+    print(q.rq.lrange("sibal",0,2)[0].decode('utf-8'))
