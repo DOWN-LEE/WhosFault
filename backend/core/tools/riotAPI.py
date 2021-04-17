@@ -14,9 +14,8 @@ url_by_name = 'https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/'
 url_rank_by_summonerid = 'https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/'
 url_matchlist_by_accontid = 'https://kr.api.riotgames.com/lol/match/v4/matchlists/by-account/'
 
-url_timeline_by_gameid = 'https://kr.api.riotgames.com/lol/match/v4/timelines/by-match/'
-url_match_by_gameid = 'https://kr.api.riotgames.com/lol/match/v4/matches/'
-url_match_by_gameidnew = 'https://asia.api.riotgames.com/lol/match/v5/matches/'
+url_timeline_by_gameid = 'https://asia.api.riotgames.com/lol/match/v5/matches/{}/timeline'
+url_match_by_gameid = 'https://asia.api.riotgames.com/lol/match/v5/matches/'
 
 
 def api_summoner(username):
@@ -37,10 +36,15 @@ async def api_rank_matchlist(summoner_id, accountId, dic):
 
 
 
-async def api_matchid(session, matchid):
-    async with session.get(url_match_by_gameidnew+matchid, headers=headers) as resp:
+async def api_match_matchid(session, matchid):
+    async with session.get(url_match_by_gameid+matchid, headers=headers) as resp:
         pokemon = await resp.json()
         print(pokemon)
+
+async def api_timeline_matchid(session, matchid):
+    async with session.get(url_timeline_by_gameid.format(matchid), headers=headers) as resp:
+        pokemon = await resp.json()
+
 
 
 async def matchlist_async(matchidlist):
@@ -48,7 +52,8 @@ async def matchlist_async(matchidlist):
     async with aiohttp.ClientSession() as session:
         tasks = []
         for matchid in matchidlist:
-            tasks.append(asyncio.ensure_future(api_matchid(session, matchid)))
+            tasks.append(asyncio.ensure_future(api_match_matchid(session, matchid)))
+            tasks.append(asyncio.ensure_future(api_timeline_matchid(session, matchid)))
 
         await asyncio.gather(*tasks)
        
@@ -64,5 +69,3 @@ def api_scheduler():
     asyncio.run(matchlist_async(matchidlist))
 
     
-
-
