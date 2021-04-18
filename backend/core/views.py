@@ -167,6 +167,7 @@ def get_result(request, username='원스타교장샘'):
     print("time :", time.time() - start)
     return HttpResponse(content=json.dumps(response_dict), status=203)
     
+    
 
 def get_userinfo(request, username='원스타교장샘'):
     if request.method == 'GET':
