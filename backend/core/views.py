@@ -228,6 +228,7 @@ def get_userinfo(request, username='원스타교장샘'):
             flex_rank_loss = flex_rank['losses']
         )
 
+        target_summoner.save()
 
     
     return HttpResponseNotAllowed(['GET'])
