@@ -8,11 +8,13 @@ whosfault는 누구 때문에 게임이 졌는지 분석하는 롤 전적서비�
 
 ## frontend
 ![image](https://user-images.githubusercontent.com/59424336/111421448-55a52b80-8730-11eb-81a3-cefa6bf66b6b.png)
-
+React
 
 ## Backend
-
+Django
 ### Message broker
-redis
+redis 기반
+
+추가예정
 ### Worker
 추가 예정
