@@ -284,7 +284,7 @@ def get_matchinfo(request, username='원스타교장샘'):
             matches_result.append(rq.get_by_key(match_id))
             rq.del_by_key(match_id)
         
-       
+        #### Match model db저장하기
         
         return HttpResponse(content=json.dumps(matches_result), status=203)
 
