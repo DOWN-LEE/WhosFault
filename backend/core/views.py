@@ -173,10 +173,21 @@ def get_userinfo(request, username='원스타교장샘'):
     if request.method == 'GET':
         try:
             summoner = Summoner.objects.get(name=username)
+
+            response_dict = {
+            'user_name': summoner.name,
+            'user_level': summoner.summonerLevel,
+            'user_profile' : summoner.profileIconId,
+            'solo_rank' : {'rank':summoner.solo_rank, 'wins':summoner.solo_rank_win, 'losses':summoner.solo_rank_loss},
+            'flex_rank' : {'rank':summoner.flex_rank, 'wins':summoner.flex_rank_win, 'losses':summoner.flex_rank_loss},
+            }
+
+            return HttpResponse(content=json.dumps(response_dict), status=203)
+
         except:
             pass
 
-        summoner = api_summoner(username)
+        summoner = api_summoner(username=username)
         if summoner.status_code != 200:
             # 없는 소환사
             return HttpResponse(status=404)
@@ -188,13 +199,9 @@ def get_userinfo(request, username='원스타교장샘'):
         accountId = summoner['accountId']
         puuid = summoner['puuid']
 
-        r_m = {"rankinfo":None, "matchlist":None}
-        ## 비동기 처리
-        asyncio.run(api_rank_matchlist(summoner_id, accountId, r_m))
-        rankinfo = r_m["rankinfo"]
-        matchlist = r_m["matchlist"]
+        rankinfo = api_rankinfo(summoner_id=summoner_id)
 
-        if matchlist.status_code != 200 or rankinfo.status_code != 200:
+        if rankinfo.status_code != 200:
             return HttpResponse(status=400)
 
         solo_rank = { 'rank':0, 'wins':0, 'losses':0 }
@@ -229,6 +236,15 @@ def get_userinfo(request, username='원스타교장샘'):
         )
 
         target_summoner.save()
+        response_dict = {
+            'user_name': username,
+            'user_level': summonerLevel,
+            'user_profile' : profileIconId,
+            'solo_rank' : solo_rank,
+            'flex_rank' : flex_rank,
+        }
+        return HttpResponse(content=json.dumps(response_dict), status=203)
+
 
     
     return HttpResponseNotAllowed(['GET'])
@@ -237,71 +253,22 @@ def get_userinfo(request, username='원스타교장샘'):
 
 def get_matchinfo(request, username='원스타교장샘'):
     if request.method == 'GET':
+        summoner = None
         try:
-            summoner = Summoner.objects.get(name=username)
-            get_info_from_db(summoner)
-            return HttpResponse(content=json.dumps(response_dict), status=203)
-            
+            summoner = Summoner.objects.get(name=username) 
         except: #소환사가 db에 없엉 ㅠㅠ
-            pass
+            return HttpResponse(status=400)
         
-        summoner = api_summoner(username=username)
-        if summoner.status_code != 200:
-            # 없는 소환사
-            return HttpResponse(status=404)
+        # Match 가 1개 이상이면 여기서 리턴
+        # 아래는 없는 경우
     
 
-        summoner = json.loads(summoner.text)
-        summonerLevel = summoner['summonerLevel']
-        profileIconId = summoner['profileIconId']
-        summoner_id = summoner['id']
-        accountId = summoner['accountId']
-        puuid = summoner['puuid']
-        
-        r_m = {"rankinfo":None, "matchlist":None}
-        ## 비동기 처리
-        asyncio.run(api_rank_matchlist(summoner_id, accountId, r_m))
-        rankinfo = r_m["rankinfo"]
-        matchlist = r_m["matchlist"]
+        matchlist = api_matchlist(summoner.puuid)
 
-        if matchlist.status_code != 200 or rankinfo.status_code != 200:
+        if matchlist.status_code != 200:
             return HttpResponse(status=400)
 
-        solo_rank = { 'rank':0, 'wins':0, 'losses':0 }
-        flex_rank = { 'rank':0, 'wins':0, 'losses':0 }
-        rankinfo = json.loads(rankinfo.text)
-        for rank in rankinfo:
-            target_rank=None
-            if rank['queueType'] == 'RANKED_FLEX_SR':
-                target_rank=flex_rank
-            elif rank['queueType'] == 'RANKED_SOLO_5x5':
-                target_rank=solo_rank
-            else:
-                continue
-
-            target_rank['rank'] = rankToNum(rank['tier'], rank['rank'])
-            target_rank['wins'] = rank['wins']
-            target_rank['losses'] = rank['losses']
-        
-        target_summoner = Summoner(
-            name = username,
-            summonerId = summoner_id,
-            accountId = accountId,
-            puuid = puuid,
-            profileIconId = int(profileIconId),
-            summonerLevel = int(summonerLevel),
-            solo_rank = solo_rank['rank'],
-            solo_rank_win = solo_rank['wins'],
-            solo_rank_loss = solo_rank['losses'],
-            flex_rank = flex_rank['rank'],
-            flex_rank_win = flex_rank['wins'],
-            flex_rank_loss = flex_rank['losses']
-        )
-
-
-        
-        
-        matchlist = json.loads(matchlist.text)['matches']
+        matchlist = json.loads(matchlist.text)
         real_matchlist=[]
         for m in matchlist:
             if m['queue'] in queue_target:
