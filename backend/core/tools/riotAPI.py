@@ -3,7 +3,7 @@ import asyncio
 import os, sys
 sys.path.insert(0,os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from core.redis.Redis import RedisQueue
-import time
+import time, datetime
 import aiohttp
 
 API_KEY='key~'
@@ -37,7 +37,7 @@ async def api_match_matchid(session, rq, matchid):
     async with session.get(url_match_by_gameid.format(matchid), headers=headers) as resp:
         matchinfo = await resp.json()
         result = analyze_match(matchinfo)
-        ### result를 rq에 key=matchid로 집어넣기
+        rq.setval(matchid, result)
         
 
 async def api_timeline_matchid(session, matchid):

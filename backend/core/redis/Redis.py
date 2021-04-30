@@ -1,4 +1,5 @@
 import redis
+import datetime
 
 REDIS_HOST = "localhost"
 REDIS_PORT = 6379
@@ -31,6 +32,10 @@ class RedisQueue(object):
     
     def getlist(self, num):
         return self.rq.lrange(self.key, 0, num)
+    
+    def setval(self, key, value):
+        self.rq.set(key, str(value), datetime.timedelta(seconds=100))
+
 
     # def get(self, isBlocking=False, timeout=None): # 데이터 꺼내기
     #     if isBlocking:
