@@ -269,44 +269,24 @@ def get_matchinfo(request, username='원스타교장샘'):
             return HttpResponse(status=400)
 
         matchlist = json.loads(matchlist.text)
-        real_matchlist=[]
-        for m in matchlist:
-            if m['queue'] in queue_target:
-                real_matchlist.append(m)
-            if len(real_matchlist) >= MATCHES_NUM:
-                break
+        
+        
 
-        matches=[]
-        average=0
         rq = RedisQueue("matches")
-        for match in real_matchlist:
-            match_id = str(match['gameId'])
+        for match_id in matchlist:
             rq.push(match_id)
         
         matches_result=[]
-        for match in real_matchlist:
-            match_id = str(match['gameId'])
+        for match_id in matchlist:
             while rq.exist_by_key(match_id)==0:
                 time.sleep(0.2)
-
+            
             matches_result.append(rq.get_by_key(match_id))
             rq.del_by_key(match_id)
         
-        matches_return = []
-        for match in matches_result:
-            matches_return.append(analyze_match(match))
+       
         
-
-        response_dict = {
-        'user_name': username,
-        'user_level': summonerLevel,
-        'user_profile' : profileIconId,
-        'solo_rank' : solo_rank,
-        'flex_rank' : flex_rank,
-        'matches' : matches_return,
-        'average' : average
-        }
-        return HttpResponse(content=json.dumps(response_dict), status=203)
+        return HttpResponse(content=json.dumps(matches_result), status=203)
 
 
     return HttpResponseNotAllowed(['GET'])
@@ -315,8 +295,7 @@ def get_matchinfo(request, username='원스타교장샘'):
 def get_info_from_db(summoner):
     pass
 
-def analyze_match(matchinfo):
-    pass
+
 
 { 
 'champion':'Lux', 'spell1':'4', 'spell2':'5', 'win':True, 'gameType':'solo',

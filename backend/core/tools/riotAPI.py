@@ -6,7 +6,7 @@ from core.redis.Redis import RedisQueue
 import time
 import aiohttp
 
-API_KEY='key~'
+API_KEY='RGAPI-00a1850a-5a51-46b9-b45f-9b36127e898a'
 headers = {'X-Riot-Token':API_KEY}
 NUMS_BY_ONETIME = 15
 
@@ -15,7 +15,7 @@ url_rank_by_summonerid = 'https://kr.api.riotgames.com/lol/league/v4/entries/by-
 url_matchlist_by_puuid = 'https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{}?start={}&end={}'
 
 url_timeline_by_gameid = 'https://asia.api.riotgames.com/lol/match/v5/matches/{}/timeline'
-url_match_by_gameid = 'https://asia.api.riotgames.com/lol/match/v5/matches/'
+url_match_by_gameid = 'https://asia.api.riotgames.com/lol/match/v5/matches/{}'
 
 
 def api_summoner(username):
@@ -30,11 +30,15 @@ def api_matchlist(puuid):
 
 
 
+def analyze_match(matchinfo):
+    return 1
 
-async def api_match_matchid(session, matchid):
-    async with session.get(url_match_by_gameid+matchid, headers=headers) as resp:
-        pokemon = await resp.json()
-        print(pokemon)
+async def api_match_matchid(session, rq, matchid):
+    async with session.get(url_match_by_gameid.format(matchid), headers=headers) as resp:
+        matchinfo = await resp.json()
+        result = analyze_match(matchinfo)
+        ### result를 rq에 key=matchid로 집어넣기
+        
 
 async def api_timeline_matchid(session, matchid):
     async with session.get(url_timeline_by_gameid.format(matchid), headers=headers) as resp:
@@ -42,16 +46,16 @@ async def api_timeline_matchid(session, matchid):
 
 
 
-async def matchlist_async(matchidlist):
+async def matchlist_async(matchidlist, rq):
     
     async with aiohttp.ClientSession() as session:
         tasks = []
         for matchid in matchidlist:
-            tasks.append(asyncio.ensure_future(api_match_matchid(session, matchid)))
-            tasks.append(asyncio.ensure_future(api_timeline_matchid(session, matchid)))
+            tasks.append(asyncio.ensure_future(api_match_matchid(session, rq, matchid)))
+            #tasks.append(asyncio.ensure_future(api_timeline_matchid(session, matchid)))
 
         await asyncio.gather(*tasks)
-       
+
 
 def api_scheduler():
     rq = RedisQueue("matches")
@@ -61,6 +65,9 @@ def api_scheduler():
 
     matchidlist = map(lambda x : x.decode(), rq.getlist(NUMS_BY_ONETIME+1))
 
-    asyncio.run(matchlist_async(matchidlist))
+    asyncio.run(matchlist_async(matchidlist, rq))
 
-    
+
+
+# asyncio.run(matchlist_async(["KR_5161780417"
+#     ]))
