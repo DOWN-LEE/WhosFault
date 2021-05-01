@@ -6,7 +6,7 @@ from core.redis.Redis import RedisQueue
 import time, datetime
 import aiohttp
 
-API_KEY='key~'
+API_KEY='RGAPI-f7d471e7-33f4-4851-9a0e-d1950091df01'
 headers = {'X-Riot-Token':API_KEY}
 NUMS_BY_ONETIME = 15
 
@@ -29,6 +29,51 @@ def api_matchlist(puuid):
     return requests.get(url_matchlist_by_puuid.format(puuid, '0', '100'), headers=headers)
 
 
+def whatispos(ip, tp, team, idx):
+    if team == 100:
+        if ip== "TOP":
+            return "1"
+        elif ip == "JUNGLE":
+            return "2"
+        elif ip == "MIDDLE":
+            return "3"
+        elif ip == "BOTTOM":
+            return "4"
+        elif ip == "UTILITY":
+            return "5"
+        else:
+            return str(idx+1)
+    
+    else:
+        if ip== "TOP":
+            return "6"
+        elif ip == "JUNGLE":
+            return "7"
+        elif ip == "MIDDLE":
+            return "8"
+        elif ip == "BOTTOM":
+            return "9"
+        elif ip == "UTILITY":
+            return "10"
+        else:
+            return str(idx+1)
+# "1":{
+#             "summonerName":,
+#             "champion":,
+#             "level":,
+#             "cs":,
+#             "kills":,
+#             "deaths":,
+#             "assists":,
+#             "position":,
+#             "item0":,
+#             "item6":,
+#             "spell1":,
+#             "spell2":,
+#             "score":,
+#             "win":,
+#         },
+
 
 def analyze_match(matchinfo):
     rq = {}
@@ -36,16 +81,50 @@ def analyze_match(matchinfo):
     rq["gameDuration"] = matchinfo["info"]["gameDuration"]
     rq["gameCreation"] = matchinfo["info"]["gameCreation"]
     rq["participants"] = {}
-    for user in matchinfo["info"]["participants"]:
+    
+    #team_rank = [[kda, 레벨, 골드, 딜, 와드점수], ]
+    team_rank = {}
+    for idx, user in enumerate(matchinfo["info"]["participants"]):
+        pos = str(idx+1)
+        rq["participants"][pos] = {}
+        rq["participants"][pos]["summonerName"] = user["summonerName"]
+        rq["participants"][pos]["championId"] = user["championId"]
+        rq["participants"][pos]["level"] = user["champLevel"]
+        rq["participants"][pos]["cs"] = user["totalMinionsKilled"] + user["neutralMinionsKilled"]
+        rq["participants"][pos]["kills"] = user["kills"]
+        rq["participants"][pos]["deaths"] = user["deaths"]
+        rq["participants"][pos]["assists"] = user["assists"]
+        rq["participants"][pos]["position"] = user["individualPosition"]
+        rq["participants"][pos]["item0"] = user["item0"]
+        rq["participants"][pos]["item1"] = user["item1"]
+        rq["participants"][pos]["item2"] = user["item2"]
+        rq["participants"][pos]["item3"] = user["item3"]
+        rq["participants"][pos]["item4"] = user["item4"]
+        rq["participants"][pos]["item5"] = user["item5"]
+        rq["participants"][pos]["item6"] = user["item6"]
+        rq["participants"][pos]["spell1"] = user["summoner1Id"]
+        rq["participants"][pos]["spell2"] = user["summoner2Id"]
+        rq["participants"][pos]["win"] = user["win"]
+
+        kda = (user["kills"] + user["assists"])*1.2 if user["deaths"] ==0 else (user["kills"] + user["assists"])/user["deaths"]
+        gold = user["goldEarned"]
+        deal = user["totalDamageDealtToChampions"]
+        ward = user["visionWardsBoughtInGame"] + user["wardsKilled"] + user["wardsPlaced"]
+        team_rank[pos] = [kda, user["champLevel"], gold, deal, ward]
+    
+    
+    print(team_rank)
         
     
-    return 1
+    return rq
+
 
 async def api_match_matchid(session, rq, matchid):
     async with session.get(url_match_by_gameid.format(matchid), headers=headers) as resp:
         matchinfo = await resp.json()
         result = analyze_match(matchinfo)
-        rq.setval(matchid, result)
+        #rq.setval(matchid, result)
+        #print(result)
         
 
 async def api_timeline_matchid(session, matchid):
@@ -77,10 +156,12 @@ def api_scheduler():
 
 
 
-# asyncio.run(matchlist_async(["KR_5161780417"
-#     ]))
+asyncio.run(matchlist_async(["KR_5164937811"
+    ],1))
 
 
+
+'''
 {
     "queueId":,
     #"matchId":,
@@ -1849,3 +1930,4 @@ def api_scheduler():
         ]
     }
 }
+'''
