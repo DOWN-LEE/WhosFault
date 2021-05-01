@@ -70,7 +70,7 @@ def whatispos(ip, tp, team, idx):
 #             "item6":,
 #             "spell1":,
 #             "spell2":,
-#             "score":,
+#             "ranking":,
 #             "win":,
 #         },
 
@@ -83,7 +83,7 @@ def analyze_match(matchinfo):
     rq["participants"] = {}
     
     #team_rank = [[kda, 레벨, 골드, 딜, 와드점수], ]
-    team_rank = {}
+    team_rank = []
     for idx, user in enumerate(matchinfo["info"]["participants"]):
         pos = str(idx+1)
         rq["participants"][pos] = {}
@@ -110,11 +110,16 @@ def analyze_match(matchinfo):
         gold = user["goldEarned"]
         deal = user["totalDamageDealtToChampions"]
         ward = user["visionWardsBoughtInGame"] + user["wardsKilled"] + user["wardsPlaced"]
-        team_rank[pos] = [kda, user["champLevel"], gold, deal, ward]
+        team_rank.append([pos,kda, user["champLevel"], gold, deal, ward])
     
-    
-    
-        
+    ranking = [["1", 0], ["2", 0], ["3", 0], ["4", 0], ["5", 0], ["6", 0], ["7", 0], ["8", 0], ["9", 0], ["10", 0]]
+    for i in range(1, 6):
+        sorted(team_rank, key=lambda x : -x[i])
+        for idx, r in enumerate(team_rank):
+            ranking[int(r[0]-1)][1] += idx
+    sorted(ranking, key=lambda x : x[1])
+    for idx, r in enumerate(ranking):
+        rq["participants"][r[0]]["ranking"] = idx+1
     
     return rq
 
