@@ -39,7 +39,7 @@ class Summoner(models.Model):
 
 class Match(models.Model):
     # summoners = models.ForeignKey
-    matchId = models.BigIntegerField()
+    matchId = models.CharField(max_length=20)
     timestamp = models.BigIntegerField()
     gametype = models.CharField(max_length=5)
 
