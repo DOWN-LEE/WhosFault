@@ -6,7 +6,7 @@ from core.redis.Redis import RedisQueue
 import time, datetime
 import aiohttp
 
-API_KEY='RGAPI-f7d471e7-33f4-4851-9a0e-d1950091df01'
+API_KEY='~'
 headers = {'X-Riot-Token':API_KEY}
 NUMS_BY_ONETIME = 15
 
@@ -113,7 +113,7 @@ def analyze_match(matchinfo):
         team_rank[pos] = [kda, user["champLevel"], gold, deal, ward]
     
     
-    print(team_rank)
+    
         
     
     return rq
