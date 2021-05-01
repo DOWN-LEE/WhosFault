@@ -7,6 +7,7 @@ import Match from '../match/match';
 import pepe_q from '../image/pepe_question.jpg';
 import { api } from '../api/index';
 import './result.css';
+import SearchBar from './SearchBar';
 
 import question from '../image/pepe_question.jpg';
 import siba from '../image/siba.png';
@@ -42,7 +43,8 @@ const resultimg= (average, len)=>{
 
 const Result = (props) => {
 
-    const [beReady, setReady] = useState(false);
+    const [userReady, setUserReady] = useState(0); // -2: error, -1: 없는유저, 0: 로딩중, 1: 정상
+    const [matchReady, setMatchReady] = useState(0);
     const [userName, set_Name] = useState('');
     const [userLevel, set_Level] = useState('');
     const [userProfile, set_Profile] = useState('');
@@ -52,21 +54,38 @@ const Result = (props) => {
     const [average, set_av] = useState(0);
 
     const[inputvalue, setinput] = useState('')
+    const[beReady, setReady] = useState(false);
 
     useEffect(()=>{
-        api.get('/results/' +props.match.params.username+'/').then((response) => {
-            console.log(response.data)
-            var result = response.data
-            set_Name(result['user_name']);
-            set_Level(result['user_level']);
-            set_Profile(result['user_profile']);
-            set_Solo(result['solo_rank']);
-            set_Flex(result['flex_rank']);
-            set_matches(result['matches']);
-            set_av(Number(result['average']));
-            setReady(true);
+        api.get('/results_user/'+props.match.params.username+'/').then((response)=>{
+            if(response.status == 203){
+                var result = response.data;
+                set_Name(result['user_name']);
+                set_Level(result['user_level']);
+                set_Profile(result['user_profile']);
+                set_Solo(result['solo_rank']);
+                set_Flex(result['flex_rank']);
+                setUserReady(1);
+            }
+            else if(response.status == 404){
+                setUserReady(-1);
+            }
+            else{
+                setUserReady(-2);
+            }
         });
-    },[beReady])
+    },[]);
+
+    useEffect(()=>{
+        if(userReady==1){
+            api.get('/results_match/'+props.match.params.username+'/').then((response)=>{
+                var result = response.data;
+                set_matches(result);
+                setMatchReady(true);
+            });
+        }
+    },[userReady]);
+
     const clickHeader =()=>{
         props.history.push('/home');
     }
@@ -83,176 +102,188 @@ const Result = (props) => {
         }
     }
 
-    if (beReady)
-    {
-        return(
-            <div>
+    // if (beReady)
+    // {
+    //     return(
+    //         <div>
                 
-                <Grid className='Headerbar'  columns='equal'>
-                    <Grid.Column  textAlign='right' verticalAlign='middle' only='computer'>
-                        <Header  className='logo_title_small' onClick={()=>clickHeader()}>
-                                <Image src={finger}/>
-                            누구 탓?
-                        </Header>
-                    </Grid.Column>
-                    <Grid.Column verticalAlign='middle'  only='computer'>
-                        <Input
-                            label={<Dropdown defaultValue='KR' options={options} />}
-                            labelPosition='left'
-                            placeholder='소환사명을 적어주세요!'
-                            action={{content:'GO!1', onClick: handleClick }}
-                            size='large'
-                            className='summoner_search'
-                            onChange={e=>setinput(e.target.value)}
-                            onKeyPress={e=>handleKey(e)}
-                        />
-                    </Grid.Column>
-                    <Grid.Column only='computer'/>
+    //             <Grid className='Headerbar'  columns='equal'>
+    //                 <Grid.Column  textAlign='right' verticalAlign='middle' only='computer'>
+    //                     <Header  className='logo_title_small' onClick={()=>clickHeader()}>
+    //                             <Image src={finger}/>
+    //                         누구 탓?
+    //                     </Header>
+    //                 </Grid.Column>
+    //                 <Grid.Column verticalAlign='middle'  only='computer'>
+    //                     <Input
+    //                         label={<Dropdown defaultValue='KR' options={options} />}
+    //                         labelPosition='left'
+    //                         placeholder='소환사명을 적어주세요!'
+    //                         action={{content:'GO!1', onClick: handleClick }}
+    //                         size='large'
+    //                         className='summoner_search'
+    //                         onChange={e=>setinput(e.target.value)}
+    //                         onKeyPress={e=>handleKey(e)}
+    //                     />
+    //                 </Grid.Column>
+    //                 <Grid.Column only='computer'/>
 
-                    <Grid.Row only='tablet mobile' centered>
-                        <Header  className='logo_title_small' onClick={()=>clickHeader()}>
-                                <Image src={finger}/>
-                            누구 탓?
-                        </Header>
-                    </Grid.Row>
-                    <Grid.Row only='tablet mobile' centered>
-                        <Input
-                            label={<Dropdown defaultValue='KR' options={options} />}
-                            labelPosition='left'
-                            placeholder='소환사명을 적어주세요!'
-                            icon = 'search'
-                            action={{onClick: handleClick }}
-                            className='summoner_search_mobile'
-                            onChange={e=>setinput(e.target.value)}
-                            onKeyPress={e=>handleKey(e)}
-                        />
-                    </Grid.Row>
-                </Grid>
+    //                 <Grid.Row only='tablet mobile' centered>
+    //                     <Header  className='logo_title_small' onClick={()=>clickHeader()}>
+    //                             <Image src={finger}/>
+    //                         누구 탓?
+    //                     </Header>
+    //                 </Grid.Row>
+    //                 <Grid.Row only='tablet mobile' centered>
+    //                     <Input
+    //                         label={<Dropdown defaultValue='KR' options={options} />}
+    //                         labelPosition='left'
+    //                         placeholder='소환사명을 적어주세요!'
+    //                         icon = 'search'
+    //                         action={{onClick: handleClick }}
+    //                         className='summoner_search_mobile'
+    //                         onChange={e=>setinput(e.target.value)}
+    //                         onKeyPress={e=>handleKey(e)}
+    //                     />
+    //                 </Grid.Row>
+    //             </Grid>
 
-                <Container>
+    //             <Container>
                     
-                <Grid>
-                    <Grid.Row only='tablet mobile' verticalAlign='middle'>
-                        <span>
-                        <img src={'http://ddragon.leagueoflegends.com/cdn/11.3.1/img/profileicon/'+userProfile+'.png'} className='profile_img_mobile'/>
-                        </span>
-                        <span>
-                        <div className='profile_name_mobile'>
-                            {userName}
-                        </div>
-                        <div className='profile_level_mobile'>
-                            LV. {userLevel}
-                        </div>
-                        </span>
+    //             <Grid>
+    //                 <Grid.Row only='tablet mobile' verticalAlign='middle'>
+    //                     <span>
+    //                     <img src={'http://ddragon.leagueoflegends.com/cdn/11.3.1/img/profileicon/'+userProfile+'.png'} className='profile_img_mobile'/>
+    //                     </span>
+    //                     <span>
+    //                     <div className='profile_name_mobile'>
+    //                         {userName}
+    //                     </div>
+    //                     <div className='profile_level_mobile'>
+    //                         LV. {userLevel}
+    //                     </div>
+    //                     </span>
                         
-                    </Grid.Row>
-                </Grid>
+    //                 </Grid.Row>
+    //             </Grid>
 
 
-                <Segment  className='profile_box'>
-                <Grid>
+    //             <Segment  className='profile_box'>
+    //             <Grid>
                     
-                    <Grid.Row  only='computer' columns={2}>
-                        <Grid.Column textAlign='left'>
-                            <span>
-                                <span>
-                                <img src={'http://ddragon.leagueoflegends.com/cdn/11.3.1/img/profileicon/'+userProfile+'.png'} className='profile_img'/>
-                                </span> 
-                                <span className='profile_name'>
-                                <div className='profile_name1'>
-                                    {userName}
-                                </div>
-                                <div className='profile_level'>
-                                    LV. {userLevel}
-                                </div>
-                                </span>
-                            </span>
-                        </Grid.Column>
-                        <Grid.Column textAlign='right'  >
+    //                 <Grid.Row  only='computer' columns={2}>
+    //                     <Grid.Column textAlign='left'>
+    //                         <span>
+    //                             <span>
+    //                             <img src={'http://ddragon.leagueoflegends.com/cdn/11.3.1/img/profileicon/'+userProfile+'.png'} className='profile_img'/>
+    //                             </span> 
+    //                             <span className='profile_name'>
+    //                             <div className='profile_name1'>
+    //                                 {userName}
+    //                             </div>
+    //                             <div className='profile_level'>
+    //                                 LV. {userLevel}
+    //                             </div>
+    //                             </span>
+    //                         </span>
+    //                     </Grid.Column>
+    //                     <Grid.Column textAlign='right'  >
                     
-                            <RankBox rankinfo={userFlexRank} isSolo={false}/>  
+    //                         <RankBox rankinfo={userFlexRank} isSolo={false}/>  
                             
-                            <RankBox rankinfo={userSoloRank} isSolo={true}/>
+    //                         <RankBox rankinfo={userSoloRank} isSolo={true}/>
                                     
                             
-                        </Grid.Column>
-                    </Grid.Row>
+    //                     </Grid.Column>
+    //                 </Grid.Row>
 
-                    <Grid.Row only='tablet mobile' centered ci   >
+    //                 <Grid.Row only='tablet mobile' centered ci   >
                         
                     
-                            <RankBox rankinfo={userSoloRank} mobile={true} className='mobile_box1' isSolo={true}/>
-                            <RankBox rankinfo={userFlexRank} mobile={true} className='mobile_box2' isSolo={false}/>
+    //                         <RankBox rankinfo={userSoloRank} mobile={true} className='mobile_box1' isSolo={true}/>
+    //                         <RankBox rankinfo={userFlexRank} mobile={true} className='mobile_box2' isSolo={false}/>
                         
 
-                    </Grid.Row>
+    //                 </Grid.Row>
                 
-                </Grid>
+    //             </Grid>
 
-                </Segment>
+    //             </Segment>
             
                 
 
             
-                    <h1>분석결과</h1>
-                    <img className ='resultimg' src={resultimg(average, matches.length)[0]}/>
-                    <h1>{resultimg(average, matches.length)[1]}</h1>
+    //                 <h1>분석결과</h1>
+    //                 <img className ='resultimg' src={resultimg(average, matches.length)[0]}/>
+    //                 <h1>{resultimg(average, matches.length)[1]}</h1>
 
-                    {matches.map((match, i) => <Match info={match} key={i}/>)}
-                </Container>
-            </div>
-        )
-    }
-    else
-    {
+    //                 {matches.map((match, i) => <Match info={match} key={i}/>)}
+    //             </Container>
+    //         </div>
+    //     )
+    // }
+    // else
+    // {
+    //     return(
+    //         <div>
+    //             <Grid className='Headerbar'  columns='equal'>
+    //                 <Grid.Column  textAlign='right' verticalAlign='middle' only='computer'>
+    //                     <Header  className='logo_title_small' onClick={()=>clickHeader()}>
+    //                             <Image src={finger}/>
+    //                         누구 탓?
+    //                     </Header>
+    //                 </Grid.Column>
+    //                 <Grid.Column verticalAlign='middle'  only='computer'>
+    //                     <Input
+    //                         label={<Dropdown defaultValue='KR' options={options} />}
+    //                         labelPosition='left'
+    //                         placeholder='소환사명을 적어주세요!'
+    //                         action={{content:'GO!', onClick: handleClick }}
+    //                         size='large'
+    //                         className='summoner_search'
+    //                         onChange={e=>setinput(e.target.value)}
+    //                         onKeyPress={e=>handleKey(e)}
+    //                     />
+    //                 </Grid.Column>
+    //                 <Grid.Column only='computer'/>
+
+    //                 <Grid.Row only='tablet mobile' centered>
+    //                     <Header  className='logo_title_small' onClick={()=>clickHeader()}>
+    //                             <Image src={finger}/>
+    //                         누구 탓?
+    //                     </Header>
+    //                 </Grid.Row>
+    //                 <Grid.Row only='tablet mobile' centered>
+    //                     <Input
+    //                         label={<Dropdown defaultValue='KR' options={options} />}
+    //                         labelPosition='left'
+    //                         placeholder='소환사명을 적어주세요!'
+    //                         icon = 'search'
+    //                         action={{onClick: handleClick }}
+    //                         className='summoner_search_mobile'
+    //                         onChange={e=>setinput(e.target.value)}
+    //                         onKeyPress={e=>handleKey(e)}
+    //                     />
+    //                 </Grid.Row>
+    //             </Grid>
+
+    //             <br/><br/><br/><br/><br/><br/><br/><br/>
+    //             <Loader active inline='centered' className='loading_icon'/>
+    //         </div>
+    //     )
+    // }
+
+    if(userReady==0){
         return(
             <div>
-                <Grid className='Headerbar'  columns='equal'>
-                    <Grid.Column  textAlign='right' verticalAlign='middle' only='computer'>
-                        <Header  className='logo_title_small' onClick={()=>clickHeader()}>
-                                <Image src={finger}/>
-                            누구 탓?
-                        </Header>
-                    </Grid.Column>
-                    <Grid.Column verticalAlign='middle'  only='computer'>
-                        <Input
-                            label={<Dropdown defaultValue='KR' options={options} />}
-                            labelPosition='left'
-                            placeholder='소환사명을 적어주세요!'
-                            action={{content:'GO!', onClick: handleClick }}
-                            size='large'
-                            className='summoner_search'
-                            onChange={e=>setinput(e.target.value)}
-                            onKeyPress={e=>handleKey(e)}
-                        />
-                    </Grid.Column>
-                    <Grid.Column only='computer'/>
-
-                    <Grid.Row only='tablet mobile' centered>
-                        <Header  className='logo_title_small' onClick={()=>clickHeader()}>
-                                <Image src={finger}/>
-                            누구 탓?
-                        </Header>
-                    </Grid.Row>
-                    <Grid.Row only='tablet mobile' centered>
-                        <Input
-                            label={<Dropdown defaultValue='KR' options={options} />}
-                            labelPosition='left'
-                            placeholder='소환사명을 적어주세요!'
-                            icon = 'search'
-                            action={{onClick: handleClick }}
-                            className='summoner_search_mobile'
-                            onChange={e=>setinput(e.target.value)}
-                            onKeyPress={e=>handleKey(e)}
-                        />
-                    </Grid.Row>
-                </Grid>
-
+                <SearchBar/>
                 <br/><br/><br/><br/><br/><br/><br/><br/>
                 <Loader active inline='centered' className='loading_icon'/>
             </div>
         )
     }
+
+
 }
 
 export default Result;
