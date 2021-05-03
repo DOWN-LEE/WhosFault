@@ -8,6 +8,7 @@ import pepe_q from '../image/pepe_question.jpg';
 import { api } from '../api/index';
 import './result.css';
 import SearchBar from './SearchBar';
+import UserInfo from './UserInfo';
 
 import question from '../image/pepe_question.jpg';
 import siba from '../image/siba.png';
@@ -40,23 +41,70 @@ const resultimg= (average, len)=>{
 
 }
 
+var ex_p = {
+    "summonerName": "원스타교장샘",
+    "champion": "Irelia",
+    "level": 11,
+    "cs": 145,
+    "kills": 1,
+    "deaths":5,
+    "assists":15,
+    "position":"TOP",
+    "item0":1055,
+    "item6":1055,
+    "spell1":4,
+    "spell2":14,
+    "score":1,
+    "win":true,
+}
+var ex_match=[
+    {
+        "queueId": 420,
+        
+        "gameDuration": 11,
+        "gameCreation": 11,
+        "participants":{
+            "1":ex_p,
+            "2":ex_p,
+            "3":ex_p,
+            "4":ex_p,
+            "5":ex_p,
+            "6":ex_p,
+            "7":ex_p,
+            "8":ex_p,
+            "9":ex_p,
+            "10":ex_p,
+        },
+    
+    }
+]
+
 
 const Result = (props) => {
 
     const [userReady, setUserReady] = useState(0); // -2: error, -1: 없는유저, 0: 로딩중, 1: 정상
-    const [matchReady, setMatchReady] = useState(0);
-    const [userName, set_Name] = useState('');
-    const [userLevel, set_Level] = useState('');
-    const [userProfile, set_Profile] = useState('');
-    const [userSoloRank, set_Solo] = useState({});
-    const [userFlexRank, set_Flex] = useState({});
-    const [matches, set_matches] = useState([]);
+    const [matchReady, setMatchReady] = useState(0); // 0: 로딩중, 1: 정상
+    const [userName, set_Name] = useState('원스타교장샘');
+    const [userLevel, set_Level] = useState('100');
+    const [userProfile, set_Profile] = useState('10');
+    const [userSoloRank, set_Solo] = useState({'rank':11, 'wins':15, 'losses':3});
+    const [userFlexRank, set_Flex] = useState({'rank':11, 'wins':3, 'losses':1});
+    const [matches, set_matches] = useState(ex_match);
     const [average, set_av] = useState(0);
 
     const[inputvalue, setinput] = useState('')
     const[beReady, setReady] = useState(false);
 
     useEffect(()=>{
+        for(var idx=0; idx < ex_match.length; idx++){
+            for(var pos=1; pos<=10; pos++){
+                if(ex_match[idx]["participants"][String(pos)]==userName){
+                    ex_match[idx]["user"]=String(pos);
+                    break;
+                }
+            }
+        }
+
         api.get('/results_user/'+props.match.params.username+'/').then((response)=>{
             if(response.status == 203){
                 var result = response.data;
@@ -80,8 +128,16 @@ const Result = (props) => {
         if(userReady==1){
             api.get('/results_match/'+props.match.params.username+'/').then((response)=>{
                 var result = response.data;
+                for(var idx=0; idx < result.length; idx++){
+                    for(var pos=1; pos<=10; pos++){
+                        if(result[idx]["participants"][String(pos)]==userName){
+                            result[idx]["user"] = String(pos);
+                            break;
+                        }
+                    }
+                }
                 set_matches(result);
-                setMatchReady(true);
+                setMatchReady(1);
             });
         }
     },[userReady]);
@@ -273,12 +329,65 @@ const Result = (props) => {
     //     )
     // }
 
-    if(userReady==0){
+    if(userReady == 0){
+        return(
+            <div>
+                <SearchBar/>
+                {/* <br/><br/><br/><br/><br/><br/><br/><br/>
+                <Loader active inline='centered' className='loading_icon'/> */}
+                <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
+                userSoloRank={userSoloRank}/>
+
+                
+                <h1>분석결과</h1>
+                <img className ='resultimg' src={resultimg(average, matches.length)[0]}/>
+                <h1>{resultimg(average, matches.length)[1]}</h1>
+
+                {ex_match.map((match, i) => <Match info={match} key={i}/>)}
+            </div>
+        )
+    }
+    else if(userReady == -2){
         return(
             <div>
                 <SearchBar/>
                 <br/><br/><br/><br/><br/><br/><br/><br/>
+                Error 발생!
+            </div>
+        )
+    }
+    else if(userReady == -1){
+        return(
+            <div>
+                <SearchBar/>
+                <br/><br/><br/><br/><br/><br/><br/><br/>
+                없는 소환사!
+            </div>
+        )
+    }
+    else if(userReady == 1 && matchReady == 0){
+        return(
+            <div>
+                <SearchBar/>
+                <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
+                userSoloRank={userSoloRank}/>
                 <Loader active inline='centered' className='loading_icon'/>
+
+            </div>
+        )
+    }
+    else if(userReady == 1 && matchReady == 1){
+        return(
+            <div>
+                <SearchBar/>
+                <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
+                userSoloRank={userSoloRank}/>
+                
+                <h1>분석결과</h1>
+                <img className ='resultimg' src={resultimg(average, matches.length)[0]}/>
+                <h1>{resultimg(average, matches.length)[1]}</h1>
+
+                {matches.map((match, i) => <Match info={match} key={i}/>)}
             </div>
         )
     }

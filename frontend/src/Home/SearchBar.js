@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Dropdown, Input, Header,Image, Container, Menu, Grid, Form, Segment, Loader  } from 'semantic-ui-react'
 import finger from '../image/finger.svg';
 
+import './SearchBar.css';
+
 
 const options = [
     { key: 'KR', text: 'KR', value: 'KR' },

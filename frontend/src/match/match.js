@@ -8,6 +8,7 @@ const champion_dict = {266: 'Aatrox', 103: 'Ahri', 84: 'Akali', 12: 'Alistar', 3
 const spell_dict = {21: 'SummonerBarrier', 1: 'SummonerBoost', 14: 'SummonerDot', 3: 'SummonerExhaust', 4: 'SummonerFlash', 6: 'SummonerHaste', 7: 'SummonerHeal', 13: 'SummonerMana', 30: 'SummonerPoroRecall', 31: 'SummonerPoroThrow', 11: 'SummonerSmite', 39: 'SummonerSnowURFSnowball_Mark', 32: 'SummonerSnowball', 12: 'SummonerTeleport'}
 
 const match=(props)=>{
+
     
     const typeTo = (type) =>{
         if(type==420) return '솔랭'
@@ -16,14 +17,16 @@ const match=(props)=>{
         return '뭔데시발'
     }
 
+    const targetuser = props.info["participants"][props.info["user"]];
+
     return(
         <Segment className='matchbox'>
             <Grid>
                 <Grid.Column width={4} >
                     <Grid.Row  >
                         <div style={{textAlign:'left'}}>
-                            <span className='rank_type'>{typeTo(props.info['gameType'])} </span>
-                            <span className={props.info['win']? 'game_result':'game_result1'} >{props.info['win']? '승리':'패배'}</span>
+                            <span className='rank_type'>{typeTo(props.info['queueId'])} </span>
+                            <span className={targetuser["win"]? 'game_result':'game_result1'} >{targetuser["win"]? '승리':'패배'}</span>
                         </div>
                     </Grid.Row>
                     <Grid.Row>
@@ -31,15 +34,15 @@ const match=(props)=>{
                         <Grid>
                         <Grid.Row columns={3}>
                             <Grid.Column width={7} verticalAlign='middle'>
-                                <img src={'http://ddragon.leagueoflegends.com/cdn/11.5.1/img/champion/'+champion_dict[props.info['champion']]+'.png'} className='champion_img' />
+                                <img src={'http://ddragon.leagueoflegends.com/cdn/11.9.1/img/champion/'+targetuser['champion']+'.png'} className='champion_img' />
                             </Grid.Column>
                             <Grid.Column width={4} verticalAlign='middle'>
-                                <img src={'http://ddragon.leagueoflegends.com/cdn/11.5.1/img/spell/'+spell_dict[props.info['spell1']]+'.png'} className='spell_img'/>
-                                <img src={'http://ddragon.leagueoflegends.com/cdn/11.5.1/img/spell/'+spell_dict[props.info['spell2']]+'.png'} className='spell_img'/>
+                                <img src={'http://ddragon.leagueoflegends.com/cdn/11.9.1/img/spell/'+spell_dict[targetuser['spell1']]+'.png'} className='spell_img'/>
+                                <img src={'http://ddragon.leagueoflegends.com/cdn/11.9.1/img/spell/'+spell_dict[targetuser['spell2']]+'.png'} className='spell_img'/>
                             </Grid.Column>
                             <Grid.Column width={5} verticalAlign='middle'>
-                                <div className='kda_score'>{props.info['kill']} / {props.info['death']} / {props.info['assist']}</div>
-                                <div className='kda'>({Number(props.info['death'])==0 ? 'Perfect': ((Number(props.info['kill'])+Number(props.info['assist']))/Number(props.info['death'])).toFixed(1)})</div>
+                                <div className='kda_score'>{targetuser['kills']} / {targetuser['deaths']} / {targetuser['assists']}</div>
+                                <div className='kda'>({Number(targetuser['deaths'])==0 ? 'Perfect': ((Number(targetuser['kills'])+Number(targetuser['assists']))/Number(targetuser['deaths'])).toFixed(1)})</div>
                                 <br/>
                             </Grid.Column>
                         </Grid.Row>
@@ -47,13 +50,13 @@ const match=(props)=>{
 
                     </Grid.Row>
                 </Grid.Column>
-                <Grid.Column width={2} className={props.info['win_team']==100?'fucking1':'fucking2'} textAlign='center' floated='right'>
-                    <div className={props.info['win_team']==100?'fucking1':'fucking2'}>{props.info['win_team']==100? '버스 탑승러❤':'패배의 원흉'}</div>
+                <Grid.Column width={2} className={props.info["participants"]["1"]['win']?'fucking1':'fucking2'} textAlign='center' floated='right'>
+                    <div className={props.info["participants"]["1"]['win']?'fucking1':'fucking2'}>{props.info["participants"]["1"]['win']? '버스 탑승러❤':'패배의 원흉'}</div>
                     <br/>
-                    {props.info['players'][props.info['team1_shit']]}
+                    {"좆밥1"}
                 </Grid.Column>        
                 <Grid.Column width={3}>
-                    <Userbox user={props.info['players'][1]} champion={champion_dict[props.info['players_champ'][1]]}/>
+                    <Userbox user={props.info['participants']["1"]} champion={champion_dict[props.info['players_champ'][1]]}/>
                     <Userbox user={props.info['players'][2]} champion={champion_dict[props.info['players_champ'][2]]}/>
                     <Userbox user={props.info['players'][3]} champion={champion_dict[props.info['players_champ'][3]]}/>
                     <Userbox user={props.info['players'][4]} champion={champion_dict[props.info['players_champ'][4]]}/>
@@ -69,7 +72,7 @@ const match=(props)=>{
                 <Grid.Column width={3} className={props.info['win_team']==200?'fucking1':'fucking2'}  textAlign='center'>
                     <div className={'1'}>{props.info['win_team']==200? '버스 탑승러❤':'패배의 원흉'}</div>
                     <br/>
-                    {props.info['players'][props.info['team2_shit']]}
+                    {"좆밥2"}
                 </Grid.Column>                         
             </Grid>
         </Segment>

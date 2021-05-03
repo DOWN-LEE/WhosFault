@@ -1,19 +1,3 @@
-.Headerbar{
-    border-bottom-style: groove;
-}
-
-.logo_title_small{
-    font-size: 2em !important;
-    font-family: 'Myung' !important;
-    cursor: pointer;
-    
-}
-
-.summoner_search > input {
-    
-    width: 500px;
-   
-}
 
 
 
@@ -22,26 +6,6 @@
     margin : 0 auto ;
 }
 
-
-.profile_box{
-    position: relative;
-    top: 20px;
-    height: 150px;
-    background-color: rgb(231, 231, 231) !important;
-}
-
-.profile_img{
-    height: 120px;
-    border-radius: 10%;
-    
-}
-.profile_img_mobile{
-    position: relative;
-    left : 15px;
-    top : 8px;
-    height: 70px;
-    border-radius: 10%;
-}
 
 .result{
     position: relative;
@@ -52,53 +16,7 @@
     height: 300px;
 }
 
-.profile_name_mobile{
-    position: relative;
-    left: 20px;
-    top: 40px;
-    font-size:xx-large;
-    font-weight: 900;
-}
 
-.profile_name{
-    position: absolute;
-    float: right;
-    left: 250px;
-    top : 30px;
-    font-size:xx-large;
-    font-weight: 900;
-}
-.profile_name1{
-    position: relative;
-    float: right;
-    left: -100px;
-    top : 30px;
-    font-size:xx-large;
-    font-weight: 900;
-}
-
-
-.profile_level_mobile{
-    position: relative;
-    top: 45px;
-    left: -50px;
-   
-    font-size: small;
-    font-weight: 200;
-}
-
-.profile_level{
-    position: relative;
-    top: 45px;
-    left: -95px;
-   
-    font-size: small;
-    font-weight: 200;
-}
-
-
-/* .loading_icon{
-    position: relative;
-    top: 100px;
-} */
-
+.loading_icon{
+    margin-top: 100px !important;
+} 

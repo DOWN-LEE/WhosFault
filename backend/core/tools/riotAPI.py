@@ -88,7 +88,7 @@ def analyze_match(matchinfo):
         pos = str(idx+1)
         rq["participants"][pos] = {}
         rq["participants"][pos]["summonerName"] = user["summonerName"]
-        rq["participants"][pos]["championId"] = user["championId"]
+        rq["participants"][pos]["champion"] = user["championName"]
         rq["participants"][pos]["level"] = user["champLevel"]
         rq["participants"][pos]["cs"] = user["totalMinionsKilled"] + user["neutralMinionsKilled"]
         rq["participants"][pos]["kills"] = user["kills"]

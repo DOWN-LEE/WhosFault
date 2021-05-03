@@ -1,0 +1,16 @@
+.Headerbar{
+  border-bottom-style: groove;
+}
+
+.logo_title_small{
+  font-size: 2em !important;
+  font-family: 'Myung' !important;
+  cursor: pointer;
+  
+}
+
+.summoner_search > input {
+  
+  width: 500px;
+ 
+}
