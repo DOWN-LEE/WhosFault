@@ -57,7 +57,7 @@ const match=(props)=>{
                 </Grid.Column>        
                 <Grid.Column width={3}>
                     <Userbox user={props.info['participants']["1"]} champion={champion_dict[props.info['players_champ'][1]]}/>
-                    <Userbox user={props.info['players'][2]} champion={champion_dict[props.info['players_champ'][2]]}/>
+                    <Userbox user={props.info['participants][2]} champion={champion_dict[props.info['players_champ'][2]]}/>
                     <Userbox user={props.info['players'][3]} champion={champion_dict[props.info['players_champ'][3]]}/>
                     <Userbox user={props.info['players'][4]} champion={champion_dict[props.info['players_champ'][4]]}/>
                     <Userbox user={props.info['players'][5]} champion={champion_dict[props.info['players_champ'][5]]}/>
