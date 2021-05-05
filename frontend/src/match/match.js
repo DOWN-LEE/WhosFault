@@ -14,10 +14,21 @@ const match=(props)=>{
         if(type==420) return '솔랭'
         if(type==430) return '노말'
         if(type==440) return '자랭'
+        if(type==450) return '칼바람'
         return '뭔데시발'
     }
 
-    const targetuser = props.info["participants"][props.info["user"]];
+
+    const targetuser = props.info["participants"]["1"]["summonerName"] == props.user ? props.info["participants"]["1"] : 
+                    props.info["participants"]["2"]["summonerName"] == props.user ? props.info["participants"]["2"] :
+                    props.info["participants"]["3"]["summonerName"] == props.user ? props.info["participants"]["3"] : 
+                    props.info["participants"]["4"]["summonerName"] == props.user ? props.info["participants"]["4"] : 
+                    props.info["participants"]["5"]["summonerName"] == props.user ? props.info["participants"]["5"] : 
+                    props.info["participants"]["6"]["summonerName"] == props.user ? props.info["participants"]["6"] : 
+                    props.info["participants"]["7"]["summonerName"] == props.user ? props.info["participants"]["7"] : 
+                    props.info["participants"]["8"]["summonerName"] == props.user ? props.info["participants"]["8"] : 
+                    props.info["participants"]["9"]["summonerName"] == props.user ? props.info["participants"]["9"] : 
+                    props.info["participants"]["10"]["summonerName"] == props.user ? props.info["participants"]["10"] : "시발뭐지?";
 
     return(
         <Segment className='matchbox'>
@@ -55,22 +66,22 @@ const match=(props)=>{
                     <br/>
                     {"좆밥1"}
                 </Grid.Column>        
-                <Grid.Column width={3}>
-                    <Userbox user={props.info['participants']["1"]} champion={champion_dict[props.info['players_champ'][1]]}/>
-                    <Userbox user={props.info['participants][2]} champion={champion_dict[props.info['players_champ'][2]]}/>
-                    <Userbox user={props.info['players'][3]} champion={champion_dict[props.info['players_champ'][3]]}/>
-                    <Userbox user={props.info['players'][4]} champion={champion_dict[props.info['players_champ'][4]]}/>
-                    <Userbox user={props.info['players'][5]} champion={champion_dict[props.info['players_champ'][5]]}/>
+                <Grid.Column width={3} verticalAlign='middle'>
+                    <Userbox user={props.info['participants']["1"]} champion={props.info['participants']['1']['champion']}/>
+                    <Userbox user={props.info['participants']['2']} champion={props.info['participants']['2']['champion']}/>
+                    <Userbox user={props.info['participants']['3']} champion={props.info['participants']['3']['champion']}/>
+                    <Userbox user={props.info['participants']['4']} champion={props.info['participants']['4']['champion']}/>
+                    <Userbox user={props.info['participants']['5']} champion={props.info['participants']['5']['champion']}/>
                 </Grid.Column>        
-                <Grid.Column width={3}>
-                    <Userbox right={true} user={props.info['players'][6]} champion={champion_dict[props.info['players_champ'][6]]}/>
-                    <Userbox right={true} user={props.info['players'][7]} champion={champion_dict[props.info['players_champ'][7]]}/>
-                    <Userbox right={true} user={props.info['players'][8]} champion={champion_dict[props.info['players_champ'][8]]}/>
-                    <Userbox right={true} user={props.info['players'][9]} champion={champion_dict[props.info['players_champ'][9]]}/>
-                    <Userbox right={true} user={props.info['players'][10]} champion={champion_dict[props.info['players_champ'][10]]}/>
+                <Grid.Column width={3} verticalAlign='middle'>
+                    <Userbox right={true} user={props.info['participants']['6']} champion={props.info['participants']['6']['champion']}/>
+                    <Userbox right={true} user={props.info['participants']['7']} champion={props.info['participants']['7']['champion']}/>
+                    <Userbox right={true} user={props.info['participants']['8']} champion={props.info['participants']['8']['champion']}/>
+                    <Userbox right={true} user={props.info['participants']['9']} champion={props.info['participants']['9']['champion']}/>
+                    <Userbox right={true} user={props.info['participants']['10']} champion={props.info['participants']['10']['champion']}/>
                 </Grid.Column>        
-                <Grid.Column width={3} className={props.info['win_team']==200?'fucking1':'fucking2'}  textAlign='center'>
-                    <div className={'1'}>{props.info['win_team']==200? '버스 탑승러❤':'패배의 원흉'}</div>
+                <Grid.Column width={3} className={props.info["participants"]["6"]['win']?'fucking1':'fucking2'}  textAlign='center'>
+                    <div className={'1'}>{props.info["participants"]["6"]['win']? '버스 탑승러❤':'패배의 원흉'}</div>
                     <br/>
                     {"좆밥2"}
                 </Grid.Column>                         

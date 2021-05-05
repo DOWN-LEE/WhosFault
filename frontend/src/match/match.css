@@ -1,3 +1,13 @@
+.matchbox{
+    width: 80% !important;
+    height: 180px;
+    margin:0 auto !important;
+    margin-bottom: 5px !important;
+    border-radius: 10px !important;
+    
+}
+
+
 .rank_type{
     position: relative;
     bottom : 10px;
@@ -64,3 +74,4 @@
     font-size: large;
     color: crimson;
 }
+

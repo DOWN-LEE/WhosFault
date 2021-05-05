@@ -14,13 +14,13 @@ const userbox=(props)=>{
             <img src={'http://ddragon.leagueoflegends.com/cdn/11.5.1/img/champion/'+props.champion+'.png'} className='userbox_img'/>
             </span>
             &nbsp;
-            <span className='usernickname'>{props.user}</span>
+            <span className='usernickname'>{props.user["summonerName"]}</span>
         </div>
         )
     else
         return(
         <div className='userbox_left'>
-            <span className='usernickname'>{props.user}</span>
+            <span className='usernickname'>{props.user["summonerName"]}</span>
             &nbsp;
             <span>
             <img src={'http://ddragon.leagueoflegends.com/cdn/11.5.1/img/champion/'+props.champion+'.png'} className='userbox_img'/>

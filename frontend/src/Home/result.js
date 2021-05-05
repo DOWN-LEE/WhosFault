@@ -60,7 +60,26 @@ var ex_p = {
 var ex_match=[
     {
         "queueId": 420,
-        
+    
+        "gameDuration": 11,
+        "gameCreation": 11,
+        "participants":{
+            "1":ex_p,
+            "2":ex_p,
+            "3":ex_p,
+            "4":ex_p,
+            "5":ex_p,
+            "6":ex_p,
+            "7":ex_p,
+            "8":ex_p,
+            "9":ex_p,
+            "10":ex_p,
+        },
+    
+    },
+    {
+        "queueId": 420,
+    
         "gameDuration": 11,
         "gameCreation": 11,
         "participants":{
@@ -96,15 +115,7 @@ const Result = (props) => {
     const[beReady, setReady] = useState(false);
 
     useEffect(()=>{
-        for(var idx=0; idx < ex_match.length; idx++){
-            for(var pos=1; pos<=10; pos++){
-                if(ex_match[idx]["participants"][String(pos)]==userName){
-                    ex_match[idx]["user"]=String(pos);
-                    break;
-                }
-            }
-        }
-
+      
         api.get('/results_user/'+props.match.params.username+'/').then((response)=>{
             if(response.status == 203){
                 var result = response.data;
@@ -329,6 +340,7 @@ const Result = (props) => {
     //     )
     // }
 
+ 
     if(userReady == 0){
         return(
             <div>
@@ -343,7 +355,7 @@ const Result = (props) => {
                 <img className ='resultimg' src={resultimg(average, matches.length)[0]}/>
                 <h1>{resultimg(average, matches.length)[1]}</h1>
 
-                {ex_match.map((match, i) => <Match info={match} key={i}/>)}
+                {matches.map((match, i) => <Match info={match} user={userName} key={i}/>)}
             </div>
         )
     }
