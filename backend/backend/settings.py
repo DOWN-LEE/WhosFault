@@ -42,9 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-CRONJOBS = [
-    ('*/5 * * * *', 'core.tools.riotAPI.api_scheduler')
-]
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
