@@ -15,6 +15,9 @@ Django
 ### Message broker
 redis 기반
 
+celery -A backend beat -l info
+celery -A backend worker -l info
+
 추가예정
 ### Worker
 추가 예정
