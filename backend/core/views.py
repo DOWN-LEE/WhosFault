@@ -22,150 +22,6 @@ MATCHES_NUM = 8
 queue_table = {'420':'solo', '430':'normal', '440':'flex', '450':'aram', '900':'URF'}
 queue_target = [420,430,440]
 
-def get_result(request, username='원스타교장샘'):
-    start = time.time()
-    try:
-        Summoner.objects.get(name=username)
-    except: #소환사가 db에 없엉 ㅠㅠ
-        pass
-
-    summoner = requests.get(url_by_name + username, headers=headers)
-
-    if summoner.status_code != 200:
-        print('wrong 잘못된 소환사 이름')
-    
-    summoner = json.loads(summoner.text)
-    summonerLevel = summoner['summonerLevel']
-    profileIconId = summoner['profileIconId']
-    summoner_id = summoner['id']
-    accountId = summoner['accountId']
-    puuid = summoner['puuid']
-
-    rankinfo = requests.get(url_rank_by_summonerid + summoner_id, headers=headers)
-
-    if rankinfo.status_code != 200:
-        print('wrong')
-
-    solo_rank = { 'rank':0, 'wins':0, 'losses':0 }
-    flex_rank = { 'rank':0, 'wins':0, 'losses':0 }
-    rankinfo = json.loads(rankinfo.text)
-    for rank in rankinfo:
-        target_rank=None
-        if rank['queueType'] == 'RANKED_FLEX_SR':
-            target_rank=flex_rank
-        elif rank['queueType'] == 'RANKED_SOLO_5x5':
-            target_rank=solo_rank
-        else:
-            continue
-
-        target_rank['rank'] = rankToNum(rank['tier'], rank['rank'])
-        target_rank['wins'] = rank['wins']
-        target_rank['losses'] = rank['losses']
-    
-    target_summoner = Summoner(
-        name = username,
-        summonerId = summoner_id,
-        accountId = accountId,
-        puuid = puuid,
-        profileIconId = int(profileIconId),
-        summonerLevel = int(summonerLevel),
-        solo_rank = solo_rank['rank'],
-        solo_rank_win = solo_rank['wins'],
-        solo_rank_loss = solo_rank['losses'],
-        flex_rank = flex_rank['rank'],
-        flex_rank_win = flex_rank['wins'],
-        flex_rank_loss = flex_rank['losses']
-    )
-
-
-    matchlist = requests.get(url_matchlist_by_accontid + accountId, headers=headers)
-    if matchlist.status_code != 200:
-        print('wrong')
-    
-    matchlist = json.loads(matchlist.text)['matches']
-    real_matchlist=[]
-    for m in matchlist:
-        if m['queue'] in queue_target:
-            real_matchlist.append(m)
-        if len(real_matchlist) >= 8:
-            break
-
-    matches=[]
-    average=0
-    for match in real_matchlist:
-        data = {}
-        match_id = str(match['gameId'])
-        player_champ = match['champion']
-        # if match['queue'] not in queue_target:
-        #     data['fault'] = False
-        # else:
-        #     data['fault'] = True
-        
-        matchinfo = requests.get(url_match_by_gameid + match_id, headers=headers)
-        if matchinfo.status_code != 200:
-            print('wrong')
-
-        matchtimeline = requests. get(url_timeline_by_gameid + match_id, headers=headers)
-        if matchtimeline.status_code != 200:
-            print('wrong')
-
-        matchinfo = json.loads(matchinfo.text)
-        matchtimeline = json.loads(matchtimeline.text)
-        
-        try:
-            lane = roleml.predict(matchinfo, matchtimeline)
-        except:
-            print(match)
-            return HttpResponse(status=400)
-        position = laneToPos(lane)
-
-        pos_to_score, team1_shit, team2_shit = calScore(matchinfo, matchtimeline['frames'], position)
-
-        players={}
-        players_champ={}
-        player_id=1
-        for p in matchinfo["participantIdentities"]:
-            players[position[p['participantId']]] = p['player']['summonerName']
-            if str(p['player']['summonerName']).strip().lower()== username.strip().lower():
-                player_id = p['participantId']
-        for p in matchinfo['participants']:
-            players_champ[position[p['participantId']]] = p['championId']
-            if player_champ == p['championId']:
-                player_spell1 = p['spell1Id']
-                player_spell2 = p['spell2Id']
-                player_win = p['stats']['win']
-                player_kills = p['stats']['kills']
-                player_deaths = p['stats']['deaths']
-                player_assists = p['stats']['assists']
-
-        data['champion'] = player_champ
-        data['spell1'] = player_spell1
-        data['spell2'] = player_spell2
-        data['win'] = player_win
-        data['gameType'] = match['queue']
-        data['kill'] = player_kills
-        data['death'] = player_deaths
-        data['assist'] = player_assists
-        data['win_team'] = 100 if matchinfo["teams"][0]['win'] =='Win' else 200
-        data['team1_shit']= team1_shit
-        data['team2_shit'] = team2_shit
-        data['players'] = players
-        data['players_champ'] = players_champ
-        matches.append(data)
-        average += pos_to_score[position[player_id]]
-    
-    
-    response_dict = {
-        'user_name': username,
-        'user_level': summonerLevel,
-        'user_profile' : profileIconId,
-        'solo_rank' : solo_rank,
-        'flex_rank' : flex_rank,
-        'matches' : matches,
-        'average' : average
-    }
-    print("time :", time.time() - start)
-    return HttpResponse(content=json.dumps(response_dict), status=203)
     
     
 
@@ -302,7 +158,7 @@ def get_info_from_db(summoner):
 'kill':10, 'death':4, 'assist':5, 'bus':'Antifasicst', 'cause':'beomsu',
 'team1_1_champ':'garen', 'team1_1_name':'시발맨',
 }
-get_result(1)
+
 
 a={
     "frames": [
@@ -12328,3 +12184,148 @@ a={
     "frameInterval": 60000
 }
 
+
+# def get_result(request, username='원스타교장샘'):
+#     start = time.time()
+#     try:
+#         Summoner.objects.get(name=username)
+#     except: #소환사가 db에 없엉 ㅠㅠ
+#         pass
+
+#     summoner = requests.get(url_by_name + username, headers=headers)
+
+#     if summoner.status_code != 200:
+#         print('wrong 잘못된 소환사 이름')
+    
+#     summoner = json.loads(summoner.text)
+#     summonerLevel = summoner['summonerLevel']
+#     profileIconId = summoner['profileIconId']
+#     summoner_id = summoner['id']
+#     accountId = summoner['accountId']
+#     puuid = summoner['puuid']
+
+#     rankinfo = requests.get(url_rank_by_summonerid + summoner_id, headers=headers)
+
+#     if rankinfo.status_code != 200:
+#         print('wrong')
+
+#     solo_rank = { 'rank':0, 'wins':0, 'losses':0 }
+#     flex_rank = { 'rank':0, 'wins':0, 'losses':0 }
+#     rankinfo = json.loads(rankinfo.text)
+#     for rank in rankinfo:
+#         target_rank=None
+#         if rank['queueType'] == 'RANKED_FLEX_SR':
+#             target_rank=flex_rank
+#         elif rank['queueType'] == 'RANKED_SOLO_5x5':
+#             target_rank=solo_rank
+#         else:
+#             continue
+
+#         target_rank['rank'] = rankToNum(rank['tier'], rank['rank'])
+#         target_rank['wins'] = rank['wins']
+#         target_rank['losses'] = rank['losses']
+    
+#     target_summoner = Summoner(
+#         name = username,
+#         summonerId = summoner_id,
+#         accountId = accountId,
+#         puuid = puuid,
+#         profileIconId = int(profileIconId),
+#         summonerLevel = int(summonerLevel),
+#         solo_rank = solo_rank['rank'],
+#         solo_rank_win = solo_rank['wins'],
+#         solo_rank_loss = solo_rank['losses'],
+#         flex_rank = flex_rank['rank'],
+#         flex_rank_win = flex_rank['wins'],
+#         flex_rank_loss = flex_rank['losses']
+#     )
+
+
+#     matchlist = requests.get(url_matchlist_by_accontid + accountId, headers=headers)
+#     if matchlist.status_code != 200:
+#         print('wrong')
+    
+#     matchlist = json.loads(matchlist.text)['matches']
+#     real_matchlist=[]
+#     for m in matchlist:
+#         if m['queue'] in queue_target:
+#             real_matchlist.append(m)
+#         if len(real_matchlist) >= 8:
+#             break
+
+#     matches=[]
+#     average=0
+#     for match in real_matchlist:
+#         data = {}
+#         match_id = str(match['gameId'])
+#         player_champ = match['champion']
+#         # if match['queue'] not in queue_target:
+#         #     data['fault'] = False
+#         # else:
+#         #     data['fault'] = True
+        
+#         matchinfo = requests.get(url_match_by_gameid + match_id, headers=headers)
+#         if matchinfo.status_code != 200:
+#             print('wrong')
+
+#         matchtimeline = requests. get(url_timeline_by_gameid + match_id, headers=headers)
+#         if matchtimeline.status_code != 200:
+#             print('wrong')
+
+#         matchinfo = json.loads(matchinfo.text)
+#         matchtimeline = json.loads(matchtimeline.text)
+        
+#         try:
+#             lane = roleml.predict(matchinfo, matchtimeline)
+#         except:
+#             print(match)
+#             return HttpResponse(status=400)
+#         position = laneToPos(lane)
+
+#         pos_to_score, team1_shit, team2_shit = calScore(matchinfo, matchtimeline['frames'], position)
+
+#         players={}
+#         players_champ={}
+#         player_id=1
+#         for p in matchinfo["participantIdentities"]:
+#             players[position[p['participantId']]] = p['player']['summonerName']
+#             if str(p['player']['summonerName']).strip().lower()== username.strip().lower():
+#                 player_id = p['participantId']
+#         for p in matchinfo['participants']:
+#             players_champ[position[p['participantId']]] = p['championId']
+#             if player_champ == p['championId']:
+#                 player_spell1 = p['spell1Id']
+#                 player_spell2 = p['spell2Id']
+#                 player_win = p['stats']['win']
+#                 player_kills = p['stats']['kills']
+#                 player_deaths = p['stats']['deaths']
+#                 player_assists = p['stats']['assists']
+
+#         data['champion'] = player_champ
+#         data['spell1'] = player_spell1
+#         data['spell2'] = player_spell2
+#         data['win'] = player_win
+#         data['gameType'] = match['queue']
+#         data['kill'] = player_kills
+#         data['death'] = player_deaths
+#         data['assist'] = player_assists
+#         data['win_team'] = 100 if matchinfo["teams"][0]['win'] =='Win' else 200
+#         data['team1_shit']= team1_shit
+#         data['team2_shit'] = team2_shit
+#         data['players'] = players
+#         data['players_champ'] = players_champ
+#         matches.append(data)
+#         average += pos_to_score[position[player_id]]
+    
+    
+#     response_dict = {
+#         'user_name': username,
+#         'user_level': summonerLevel,
+#         'user_profile' : profileIconId,
+#         'solo_rank' : solo_rank,
+#         'flex_rank' : flex_rank,
+#         'matches' : matches,
+#         'average' : average
+#     }
+#     print("time :", time.time() - start)
+#     return HttpResponse(content=json.dumps(response_dict), status=203)

@@ -155,7 +155,8 @@ def api_scheduler():
     if rq.isEmpty():
         return
 
-    matchidlist = map(lambda x : x.decode(), rq.getlist(NUMS_BY_ONETIME+1))
+    #matchidlist = map(lambda x : x.decode(), rq.getlist(NUMS_BY_ONETIME))
+    matchidlist = rq.getlist(NUMS_BY_ONETIME)
 
     asyncio.run(matchlist_async(matchidlist, rq))
 

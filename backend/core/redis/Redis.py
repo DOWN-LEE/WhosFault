@@ -31,7 +31,14 @@ class RedisQueue(object):
         self
     
     def getlist(self, num):
-        return self.rq.lrange(self.key, 0, num)
+        ans = []
+        for _ in range(num):
+            x = self.rq.lpop(self.key)
+            if(x==None):
+                break
+            ans.append(x.decode())
+        return ans
+        #return self.rq.lrange(self.key, 0, num)
     
     def setval(self, key, value):
         self.rq.set(key, str(value), datetime.timedelta(seconds=100))
@@ -64,4 +71,4 @@ class RedisQueue(object):
 
 if __name__ == '__main__':
     q = RedisQueue("sibal")
-    print(q.rq.lrange("sibal",0,2)[0].decode('utf-8'))
+    print(q.rq.lpop("sibal").decode())
