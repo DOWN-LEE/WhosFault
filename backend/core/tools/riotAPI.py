@@ -6,7 +6,7 @@ from core.redis.Redis import RedisQueue
 import time, datetime
 import aiohttp
 
-API_KEY='RGAPI-32a7383a-e3d0-473c-b734-0d42ba64cb66'
+API_KEY='RGAPI'
 headers = {'X-Riot-Token':API_KEY}
 NUMS_BY_ONETIME = 15
 
