@@ -6,13 +6,13 @@ from core.redis.Redis import RedisQueue
 import time, datetime
 import aiohttp
 
-API_KEY='~'
+API_KEY='RGAPI-32a7383a-e3d0-473c-b734-0d42ba64cb66'
 headers = {'X-Riot-Token':API_KEY}
 NUMS_BY_ONETIME = 15
 
 url_by_name = 'https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/'
 url_rank_by_summonerid = 'https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/'
-url_matchlist_by_puuid = 'https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{}?start={}&end={}'
+url_matchlist_by_puuid = 'https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/{}/ids?start={}&end={}'
 
 url_timeline_by_gameid = 'https://asia.api.riotgames.com/lol/match/v5/matches/{}/timeline'
 url_match_by_gameid = 'https://asia.api.riotgames.com/lol/match/v5/matches/{}'
@@ -26,7 +26,7 @@ def api_rankinfo(summoner_id):
     return requests.get(url_rank_by_summonerid + summoner_id, headers=headers)
 
 def api_matchlist(puuid):
-    return requests.get(url_matchlist_by_puuid.format(puuid, '0', '100'), headers=headers)
+    return requests.get(url_matchlist_by_puuid.format(puuid, '0', '3'), headers=headers)
 
 
 def whatispos(ip, tp, team, idx):
@@ -104,7 +104,7 @@ def analyze_match(matchinfo):
         rq["participants"][pos]["item6"] = user["item6"]
         rq["participants"][pos]["spell1"] = user["summoner1Id"]
         rq["participants"][pos]["spell2"] = user["summoner2Id"]
-        rq["participants"][pos]["win"] = user["win"]
+        rq["participants"][pos]["win"] = 10 if user["win"] else 0
 
         kda = (user["kills"] + user["assists"])*1.2 if user["deaths"] ==0 else (user["kills"] + user["assists"])/user["deaths"]
         gold = user["goldEarned"]
@@ -116,7 +116,7 @@ def analyze_match(matchinfo):
     for i in range(1, 6):
         sorted(team_rank, key=lambda x : -x[i])
         for idx, r in enumerate(team_rank):
-            ranking[int(r[0]-1)][1] += idx
+            ranking[int(r[0])-1][1] += idx
     sorted(ranking, key=lambda x : x[1])
     for idx, r in enumerate(ranking):
         rq["participants"][r[0]]["ranking"] = idx+1
@@ -127,8 +127,11 @@ def analyze_match(matchinfo):
 async def api_match_matchid(session, rq, matchid):
     async with session.get(url_match_by_gameid.format(matchid), headers=headers) as resp:
         matchinfo = await resp.json()
-        result = analyze_match(matchinfo)
-        #rq.setval(matchid, result)
+        result = "None"
+        if 'status'  not in matchinfo:
+            result = analyze_match(matchinfo)
+        
+        rq.setval(matchid, result)
         #print(result)
         
 

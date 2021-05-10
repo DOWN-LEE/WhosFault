@@ -109,10 +109,12 @@ def get_userinfo(request, username='원스타교장샘'):
 
 def get_matchinfo(request, username='원스타교장샘'):
     if request.method == 'GET':
+        print("match start!")
         summoner = None
         try:
             summoner = Summoner.objects.get(name=username) 
         except: #소환사가 db에 없엉 ㅠㅠ
+            print("no db ")
             return HttpResponse(status=400)
         
         # Match 가 1개 이상이면 여기서 리턴
@@ -120,8 +122,9 @@ def get_matchinfo(request, username='원스타교장샘'):
     
 
         matchlist = api_matchlist(summoner.puuid)
-
+        print(summoner.puuid)
         if matchlist.status_code != 200:
+            print("matchlist error")
             return HttpResponse(status=400)
 
         matchlist = json.loads(matchlist.text)
@@ -137,7 +140,12 @@ def get_matchinfo(request, username='원스타교장샘'):
             while rq.exist_by_key(match_id)==0:
                 time.sleep(0.2)
             
-            matches_result.append(rq.get_by_key(match_id))
+            result = rq.get_by_key(match_id).decode().replace("'", "\"")
+            print(result)
+            if result == "None":
+                pass
+            else:
+                matches_result.append(json.loads(result))
             rq.del_by_key(match_id)
         
         #### Match model db저장하기

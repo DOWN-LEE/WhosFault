@@ -13,11 +13,11 @@ NUMS_BY_ONETIME = 10
 def api_scheduler():
     rq = RedisQueue("matches")
 
-    print("hello!")
     if rq.isEmpty():
-        return
+        return None
 
     #matchidlist = map(lambda x : x.decode(), rq.getlist(NUMS_BY_ONETIME))
     matchidlist = rq.getlist(NUMS_BY_ONETIME)
 
     asyncio.run(matchlist_async(matchidlist, rq))
+    return(len(matchidlist))

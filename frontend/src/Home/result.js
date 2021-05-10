@@ -116,28 +116,33 @@ const Result = (props) => {
 
     useEffect(()=>{
       
-        api.get('/results_user/'+props.match.params.username+'/').then((response)=>{
-            if(response.status == 203){
-                var result = response.data;
-                set_Name(result['user_name']);
-                set_Level(result['user_level']);
-                set_Profile(result['user_profile']);
-                set_Solo(result['solo_rank']);
-                set_Flex(result['flex_rank']);
-                setUserReady(1);
-            }
-            else if(response.status == 404){
+        api.get('/user/'+props.match.params.username+'/').then((response)=>{
+            
+            var result = response.data;
+            set_Name(result['user_name']);
+            set_Level(result['user_level']);
+            set_Profile(result['user_profile']);
+            set_Solo(result['solo_rank']);
+            set_Flex(result['flex_rank']);
+            setUserReady(1);
+        
+            
+        }).catch((response)=>{
+            if(response.response.status == 404){
+               
                 setUserReady(-1);
             }
             else{
+                
                 setUserReady(-2);
             }
         });
+
     },[]);
 
     useEffect(()=>{
         if(userReady==1){
-            api.get('/results_match/'+props.match.params.username+'/').then((response)=>{
+            api.get('/match/'+props.match.params.username+'/').then((response)=>{
                 var result = response.data;
                 for(var idx=0; idx < result.length; idx++){
                     for(var pos=1; pos<=10; pos++){
@@ -344,10 +349,10 @@ const Result = (props) => {
     if(userReady == 0){
         return(
             <div>
-                <SearchBar/>
-                {/* <br/><br/><br/><br/><br/><br/><br/><br/>
-                <Loader active inline='centered' className='loading_icon'/> */}
-                <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
+                <SearchBar history={props.history}/>
+                <br/><br/><br/><br/><br/><br/><br/><br/>
+                <Loader active inline='centered' className='loading_icon'/>
+                {/* <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
                 userSoloRank={userSoloRank}/>
 
                 
@@ -355,14 +360,14 @@ const Result = (props) => {
                 <img className ='resultimg' src={resultimg(average, matches.length)[0]}/>
                 <h1>{resultimg(average, matches.length)[1]}</h1>
 
-                {matches.map((match, i) => <Match info={match} user={userName} key={i}/>)}
+                {matches.map((match, i) => <Match info={match} user={userName} key={i}/>)} */}
             </div>
         )
     }
     else if(userReady == -2){
         return(
             <div>
-                <SearchBar/>
+                <SearchBar history={props.history}/>
                 <br/><br/><br/><br/><br/><br/><br/><br/>
                 Error 발생!
             </div>
@@ -371,7 +376,7 @@ const Result = (props) => {
     else if(userReady == -1){
         return(
             <div>
-                <SearchBar/>
+                <SearchBar history={props.history}/>
                 <br/><br/><br/><br/><br/><br/><br/><br/>
                 없는 소환사!
             </div>
@@ -380,7 +385,7 @@ const Result = (props) => {
     else if(userReady == 1 && matchReady == 0){
         return(
             <div>
-                <SearchBar/>
+                <SearchBar history={props.history}/>
                 <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
                 userSoloRank={userSoloRank}/>
                 <Loader active inline='centered' className='loading_icon'/>
@@ -391,7 +396,7 @@ const Result = (props) => {
     else if(userReady == 1 && matchReady == 1){
         return(
             <div>
-                <SearchBar/>
+                <SearchBar history={props.history}/>
                 <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
                 userSoloRank={userSoloRank}/>
                 
@@ -399,7 +404,7 @@ const Result = (props) => {
                 <img className ='resultimg' src={resultimg(average, matches.length)[0]}/>
                 <h1>{resultimg(average, matches.length)[1]}</h1>
 
-                {matches.map((match, i) => <Match info={match} key={i}/>)}
+                {matches.map((match, i) => <Match info={match} user={userName} key={i}/>)}
             </div>
         )
     }
