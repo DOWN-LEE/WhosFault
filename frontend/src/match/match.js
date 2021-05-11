@@ -29,9 +29,33 @@ const match=(props)=>{
                     props.info["participants"]["8"]["summonerName"] == props.user ? props.info["participants"]["8"] : 
                     props.info["participants"]["9"]["summonerName"] == props.user ? props.info["participants"]["9"] : 
                     props.info["participants"]["10"]["summonerName"] == props.user ? props.info["participants"]["10"] : "시발뭐지?";
+    
+    const team1_worst = () =>{
+        let worst = props.info["participants"]["1"]["summonerName"];
+        let worst_rank = props.info["participants"]["1"]['ranking']
+        for(var i=2; i<=5; i++){
+            if(worst_rank < props.info["participants"][String(i)]['ranking']){
+                worst = props.info["participants"][String(i)]["summonerName"];
+                worst_rank = props.info["participants"][String(i)]['ranking'];
+            }
+        }
+        return worst;
+    }
+
+    const team2_worst = () =>{
+        let worst = props.info["participants"]["6"]["summonerName"];
+        let worst_rank = props.info["participants"]["6"]['ranking']
+        for(var i=7; i<=10; i++){
+            if(worst_rank < props.info["participants"][String(i)]['ranking']){
+                worst = props.info["participants"][String(i)]["summonerName"];
+                worst_rank = props.info["participants"][String(i)]['ranking'];
+            }
+        }
+        return worst;
+    }
 
     return(
-        <Segment className='matchbox'>
+        <Segment className={targetuser["win"]? 'matchbox_win':'matchbox_loss'}>
             <Grid>
                 <Grid.Column width={4} >
                     <Grid.Row  >
@@ -64,7 +88,7 @@ const match=(props)=>{
                 <Grid.Column width={2} className={props.info["participants"]["1"]['win']?'fucking1':'fucking2'} textAlign='center' floated='right'>
                     <div className={props.info["participants"]["1"]['win']?'fucking1':'fucking2'}>{props.info["participants"]["1"]['win']? '버스 탑승러❤':'패배의 원흉'}</div>
                     <br/>
-                    {"좆밥1"}
+                    {team1_worst()}
                 </Grid.Column>        
                 <Grid.Column width={3} verticalAlign='middle'>
                     <Userbox user={props.info['participants']["1"]} champion={props.info['participants']['1']['champion']}/>
@@ -83,7 +107,7 @@ const match=(props)=>{
                 <Grid.Column width={3} className={props.info["participants"]["6"]['win']?'fucking1':'fucking2'}  textAlign='center'>
                     <div className={'1'}>{props.info["participants"]["6"]['win']? '버스 탑승러❤':'패배의 원흉'}</div>
                     <br/>
-                    {"좆밥2"}
+                    {team2_worst()}
                 </Grid.Column>                         
             </Grid>
         </Segment>

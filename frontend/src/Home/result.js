@@ -27,6 +27,7 @@ const resultimg= (average, len)=>{
         return [pepe_q, '경기가 부족합니다']
     }
     let score = average/len;
+   
 
     if(score <=3){
         return[siba, '훌륭한 경기력!....']
@@ -54,7 +55,7 @@ var ex_p = {
     "item6":1055,
     "spell1":4,
     "spell2":14,
-    "score":1,
+    "ranking":1,
     "win":true,
 }
 var ex_match=[
@@ -111,68 +112,59 @@ const Result = (props) => {
     const [matches, set_matches] = useState(ex_match);
     const [average, set_av] = useState(0);
 
-    const[inputvalue, setinput] = useState('')
-    const[beReady, setReady] = useState(false);
+
 
     useEffect(()=>{
-      
-        api.get('/user/'+props.match.params.username+'/').then((response)=>{
-            
-            var result = response.data;
-            set_Name(result['user_name']);
-            set_Level(result['user_level']);
-            set_Profile(result['user_profile']);
-            set_Solo(result['solo_rank']);
-            set_Flex(result['flex_rank']);
-            setUserReady(1);
         
-            
-        }).catch((response)=>{
-            if(response.response.status == 404){
-               
-                setUserReady(-1);
-            }
-            else{
+        if(userReady==0){
+            api.get('/user/'+props.match.params.username+'/').then((response)=>{
                 
-                setUserReady(-2);
-            }
-        });
+                var result = response.data;
+                set_Name(result['user_name']);
+                set_Level(result['user_level']);
+                set_Profile(result['user_profile']);
+                set_Solo(result['solo_rank']);
+                set_Flex(result['flex_rank']);
+                setUserReady(1);
+            
+                
+            }).catch((response)=>{
+                if(response.response.status == 404){
+                
+                    setUserReady(-1);
+                }
+                else{
+                    
+                    setUserReady(-2);
+                }
+            });
+        }     
 
-    },[]);
+    },[userReady]);
 
     useEffect(()=>{
         if(userReady==1){
             api.get('/match/'+props.match.params.username+'/').then((response)=>{
                 var result = response.data;
+                let rank=0;
                 for(var idx=0; idx < result.length; idx++){
                     for(var pos=1; pos<=10; pos++){
-                        if(result[idx]["participants"][String(pos)]==userName){
-                            result[idx]["user"] = String(pos);
+                        if(result[idx]["participants"][String(pos)]["summonerName"]==userName){
+                            rank += result[idx]["participants"][String(pos)]["ranking"];
+                            
                             break;
                         }
                     }
                 }
+
+                set_av(rank)
                 set_matches(result);
                 setMatchReady(1);
             });
         }
     },[userReady]);
 
-    const clickHeader =()=>{
-        props.history.push('/home');
-    }
-
-     const handleClick =()=>{
-        props.history.push(inputvalue);
-        setReady(false);
-    }
-
-    const handleKey=(e)=>{
-        if(e.key=='Enter'){
-            props.history.push(inputvalue);
-            setReady(false);
-        }
-    }
+   
 
     // if (beReady)
     // {
@@ -349,7 +341,7 @@ const Result = (props) => {
     if(userReady == 0){
         return(
             <div>
-                <SearchBar history={props.history}/>
+                <SearchBar history={props.history} setUserReady={setUserReady} setMatchReady={setMatchReady}/>
                 <br/><br/><br/><br/><br/><br/><br/><br/>
                 <Loader active inline='centered' className='loading_icon'/>
                 {/* <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
@@ -367,7 +359,7 @@ const Result = (props) => {
     else if(userReady == -2){
         return(
             <div>
-                <SearchBar history={props.history}/>
+                <SearchBar history={props.history} setUserReady={setUserReady} setMatchReady={setMatchReady}/>
                 <br/><br/><br/><br/><br/><br/><br/><br/>
                 Error 발생!
             </div>
@@ -376,7 +368,7 @@ const Result = (props) => {
     else if(userReady == -1){
         return(
             <div>
-                <SearchBar history={props.history}/>
+                <SearchBar history={props.history} setUserReady={setUserReady} setMatchReady={setMatchReady}/>
                 <br/><br/><br/><br/><br/><br/><br/><br/>
                 없는 소환사!
             </div>
@@ -385,7 +377,7 @@ const Result = (props) => {
     else if(userReady == 1 && matchReady == 0){
         return(
             <div>
-                <SearchBar history={props.history}/>
+                <SearchBar history={props.history} setUserReady={setUserReady} setMatchReady={setMatchReady}/>
                 <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
                 userSoloRank={userSoloRank}/>
                 <Loader active inline='centered' className='loading_icon'/>
@@ -396,7 +388,7 @@ const Result = (props) => {
     else if(userReady == 1 && matchReady == 1){
         return(
             <div>
-                <SearchBar history={props.history}/>
+                <SearchBar history={props.history} setUserReady={setUserReady} setMatchReady={setMatchReady}/>
                 <UserInfo userName={userName} userLevel={userLevel} userProfile={userProfile} userFlexRank={userFlexRank}
                 userSoloRank={userSoloRank}/>
                 

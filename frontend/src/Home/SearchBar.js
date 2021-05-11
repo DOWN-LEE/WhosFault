@@ -15,7 +15,7 @@ const options = [
 const SearchBar = (props) =>{
 
     const[inputvalue, setinput] = useState('')
-    const[beReady, setReady] = useState(false);
+  
 
     const clickHeader =()=>{
         props.history.push('/home');
@@ -23,13 +23,15 @@ const SearchBar = (props) =>{
 
      const handleClick =()=>{
         props.history.push(inputvalue);
-        setReady(false);
+        props.setMatchReady(0);
+        props.setUserReady(0);
     }
 
     const handleKey=(e)=>{
         if(e.key=='Enter'){
             props.history.push(inputvalue);
-            setReady(false);
+            props.setMatchReady(0);
+            props.setUserReady(0);
         }
     }
     
