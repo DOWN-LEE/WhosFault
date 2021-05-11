@@ -5,6 +5,7 @@ import React from 'react';
 
 import Home from './Home/Home';
 import Result from './Home/result';
+import Riot from './Riot';
 
 function App(props) {
   return (
@@ -13,6 +14,7 @@ function App(props) {
         <Switch>
           <Route path="/home" exact component={Home} />
           <Route path='/result/:username' exact component={Result}/>
+          <Route path='/riot.txt' exact component={Riot}/>
           <Redirect exact from="/" to="home" />
           <Route render={() => <h1 data-testid="NotFound">Not Found</h1>} />
         </Switch>
