@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dropdown, Input, Header,Image, Container, Menu, Grid, Form, Segment, Loader  } from 'semantic-ui-react'
+import { Dropdown, Input, Header,Image, Container, Menu, Grid, Form, Segment, Button  } from 'semantic-ui-react'
 import finger from '../image/finger.svg';
 
 import './SearchBar.css';
@@ -49,14 +49,17 @@ const SearchBar = (props) =>{
                         label={<Dropdown defaultValue='KR' options={options} />}
                         labelPosition='left'
                         placeholder='소환사명을 적어주세요!'
-                        action={{content:'GO!', onClick: handleClick }}
+                       
                         size='large'
                         className='summoner_search'
                         onChange={e=>setinput(e.target.value)}
                         onKeyPress={e=>handleKey(e)}
                     />
                 </Grid.Column>
-                <Grid.Column only='computer'/>
+                    
+                <Grid.Column only='computer' verticalAlign='left'>
+                
+                </Grid.Column>
 
                 <Grid.Row only='tablet mobile' centered>
                     <Header  className='logo_title_small' onClick={()=>clickHeader()}>

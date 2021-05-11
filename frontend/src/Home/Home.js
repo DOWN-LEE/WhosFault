@@ -16,11 +16,12 @@ const MainPage = (props) => {
     const[inputvalue, setinput] = useState('')
 
     const handleClick =()=>{
-        props.history.push('result/'+inputvalue);
+        if(inputvalue!='')
+            props.history.push('result/'+inputvalue);
     }
 
     const handleKey=(e)=>{
-        if(e.key=='Enter'){
+        if(e.key=='Enter' && inputvalue!=''){
             props.history.push('result/'+inputvalue);
         }
     }
