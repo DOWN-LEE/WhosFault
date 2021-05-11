@@ -3,3 +3,7 @@ django-cors-headers
 requests
 roleml
 aiohttp
+celery
+redis
+django-celery-beat
+django-celery-results
