@@ -4,18 +4,14 @@ import riot from './store/riot.txt';
 
 const Riot = (props) => {
 
-    function downloadURI(uri, name){
-        var link = document.createElement("a");
-        link.download = name; link.href = uri;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-         }
+    function downloadURI(){
+        fetch('./store/riot.txt').then((r) => r.json());
+    }
 
 
    return(
        <div>
-        {downloadURI(riot, 'riot.txt')}
+        {downloadURI()}
        </div>
    )
 
