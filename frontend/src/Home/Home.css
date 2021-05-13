@@ -15,3 +15,7 @@
     position: relative;
     margin : 0 auto ;
 }
+
+.logo_big{
+    width: 500px !important;
+}

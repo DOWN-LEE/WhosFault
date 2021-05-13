@@ -4,6 +4,7 @@ import './Home.css';
 
 import finger from '../image/finger.svg';
 import pepe_q from '../image/pepe_question.jpg';
+import logo from '../image/logo.png';
 
 const options = [
     { key: 'KR', text: 'KR', value: 'KR' },
@@ -30,8 +31,7 @@ const MainPage = (props) => {
         <div>
             <br/>
             <Header  className='logo_title'>
-                <Image src={finger}/>
-                누구 탓?
+                <Image className='logo_big' src={logo}/>
             </Header>
             <Input
                 label={<Dropdown defaultValue='KR' options={options} />}

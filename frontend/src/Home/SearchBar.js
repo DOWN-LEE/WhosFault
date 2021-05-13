@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dropdown, Input, Header,Image, Container, Menu, Grid, Form, Segment, Button  } from 'semantic-ui-react'
 import finger from '../image/finger.svg';
+import logo from '../image/logo_small.png';
 
 import './SearchBar.css';
 
@@ -40,8 +41,8 @@ const SearchBar = (props) =>{
             <Grid className='Headerbar'  columns='equal'>
                 <Grid.Column  textAlign='right' verticalAlign='middle' only='computer'>
                     <Header  className='logo_title_small' onClick={()=>clickHeader()}>
-                            <Image src={finger}/>
-                        누구 탓?
+                            <Image src={logo} className='logo_small'/>
+                       
                     </Header>
                 </Grid.Column>
                 <Grid.Column verticalAlign='middle'  only='computer'>
@@ -63,8 +64,8 @@ const SearchBar = (props) =>{
 
                 <Grid.Row only='tablet mobile' centered>
                     <Header  className='logo_title_small' onClick={()=>clickHeader()}>
-                            <Image src={finger}/>
-                        누구 탓?
+                    <Image src={logo} className='logo_small'/>
+                   
                     </Header>
                 </Grid.Row>
                 <Grid.Row only='tablet mobile' centered>
