@@ -13,11 +13,45 @@ React
 ## Backend
 Django
 ### Message broker
-redis 기반
+Redis 기반
 
-celery -A backend beat -l info
-celery -A backend worker -l info
 
-추가예정
+
+
 ### Worker
-추가 예정
+Celery
+
+
+```
+sudo apt-get update
+sudo apt install python3-pip
+sudo pip3 install virtualenv
+sudo apt install python3.7
+virtualenv --python=python3.7 virtual
+
+sudo apt-get install npm
+sudo npm cache clean -f
+sudo npm install -g n
+sudo n stable # updating nodejs to newer version
+sudo apt-get install npm
+sudo npm install -g yarn
+sudo npm install -g create-react-app
+```
+
+```
+git clone & cd
+backend > pip install -r requirements
+sudo apt-get update
+sudo apt-get install mysql-server
+sudo apt-get install libmysqlclient-dev
+sudo apt-get install python3.7-dev
+sudo mysql -u root -p
+CREATE DATABASE mydb CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+create user 'who'@'%' identified by [password];
+grant all on mydb.* to 'who'@'%';
+flush privileges;
+```
+```
+celery -A backend beat -l info 
+celery -A backend worker -l info 
+```
