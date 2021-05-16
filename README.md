@@ -1,4 +1,5 @@
 # whosfault
+http://www.whosfault.me/  
 
 ## Introduction
 League of Legend 라는 게임을 하다 보면 팀원들이 못해서 지는 경우가 많습니다.
