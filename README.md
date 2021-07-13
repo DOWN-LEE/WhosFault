@@ -15,6 +15,7 @@ The frontend is implemented based on React.
 ## Backend
 A backend API is implemented based on Django. When a user's request comes in, it receives the user's information through the RIOT API, analyzes it, and returns it.
 However, the RIOT API has a rate limit. Even if a large number of users connect at the same time, the rate limit is not exceeded. Message queue is implemented in Redis, and Celery fetches tasks from the queue and processes them at a rate that does not exceed the rate limit. The implementation structure is shown in the image below.
+
 ![image](https://user-images.githubusercontent.com/59424336/125446901-db8bb39b-d66e-4655-a8ca-30c258746530.png)
 
 
