@@ -1,17 +1,21 @@
 # whosfault
 http://www.whosfault.me/
 (production API pending approval)
-
+  
+  
 ## Introduction
 When playing a game called League of Legends, you often lose because your team members do not do well.
 But is it really because of your team?
 whosfault is a role statistics service that analyzes who lost a game.
-
+  
+  
 ## frontend
 ![image](https://user-images.githubusercontent.com/59424336/111421448-55a52b80-8730-11eb-81a3-cefa6bf66b6b.png)
 
-The frontend is implemented based on React.
-
+The frontend is implemented based on React. As shown in the image above, users can search for a game nickname through the search bar, and the game history and analysis results of the user corresponding to the nickname are displayed.
+  
+  
+  
 ## Backend
 A backend API is implemented based on Django. When a user's request comes in, it receives the user's information through the RIOT API, analyzes it, and returns it.
 However, the RIOT API has a rate limit. Even if a large number of users connect at the same time, the rate limit is not exceeded. Message queue is implemented in Redis, and Celery fetches tasks from the queue and processes them at a rate that does not exceed the rate limit. The implementation structure is shown in the image below.
