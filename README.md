@@ -1,27 +1,25 @@
 # whosfault
-http://www.whosfault.me/  
+http://www.whosfault.me/
+(production API pending approval)
 
 ## Introduction
-League of Legend 라는 게임을 하다 보면 팀원들이 못해서 지는 경우가 많습니다.
-그런데 정말 팀원 때문일까요?
-whosfault는 누구 때문에 게임이 졌는지 분석하는 롤 전적서비스 입니다.
-
+When playing a game called League of Legends, you often lose because your team members do not do well.
+But is it really because of your team?
+whosfault is a role statistics service that analyzes who lost a game.
 
 ## frontend
 ![image](https://user-images.githubusercontent.com/59424336/111421448-55a52b80-8730-11eb-81a3-cefa6bf66b6b.png)
-React
+
+The frontend is implemented based on React.
 
 ## Backend
-Django
-### Message broker
-Redis 기반
+A backend API is implemented based on Django. When a user's request comes in, it receives the user's information through the RIOT API, analyzes it, and returns it.
+However, the RIOT API has a rate limit. Even if a large number of users connect at the same time, the rate limit is not exceeded. Message queue is implemented in Redis, and Celery fetches tasks from the queue and processes them at a rate that does not exceed the rate limit. The implementation structure is shown in the image below.
+![image](https://user-images.githubusercontent.com/59424336/125446901-db8bb39b-d66e-4655-a8ca-30c258746530.png)
 
 
 
-
-### Worker
-Celery
-
+## How to deploy
 
 ```
 sudo apt-get update
